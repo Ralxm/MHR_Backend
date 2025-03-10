@@ -13,7 +13,8 @@ const Projetos = SequelizeDB.define('projetos', {
         references: {
             model: Ideia,
             key: 'id_ideia'
-        }
+        },
+        allowNull: true
     },
     titulo_projeto: Sequelize.CHAR(256),
     estado: Sequelize.STRING(50),

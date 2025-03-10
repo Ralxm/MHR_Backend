@@ -1,0 +1,133 @@
+var Perfis = require('../models/Perfis')
+const controller = {};
+
+function getDate(){
+    let now = new Date();
+    let dd = now.getDate();
+    let mm = now.getMonth() + 1;
+    let yyyy = now.getFullYear();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    let today = `${yyyy}-${mm}-${dd}`;
+    return today;
+}
+
+controller.perfisCreate = async function (req, res){
+    const { id_departamento, id_utilizador, nome, email, morada, telemovel, data_nascimento, distrito } = req.body;
+    const data = await Perfis.create({
+        id_departamento: id_departamento,
+        id_utilizador: id_utilizador,
+        nome: nome,
+        email: email,
+        morada: morada,
+        telemovel: telemovel,
+        data_nascimento: data_nascimento,
+        distrito: distrito,
+        created_at: getDate(),
+        updated_at: getDate()
+    })
+    .then(function(data){
+        res.status(200).json({
+            success: true,
+            message: "Perfil criado",
+            data: data
+        })
+    })
+    .catch(error =>
+        res.status(500).json({
+            success: false,
+            message: "Erro a criar o Perfil",
+            error: error.message
+        })
+    )
+}
+
+controller.perfisList = async function (req, res){
+    const data = await Perfis.findAll({order: ['nome']})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os perfis",
+            error: error.message
+        });
+    });
+}
+
+controller.perfisGet = async function (req, res){
+    const { id } = req.params;
+    const data = await Perfis.findAll({
+        where: { id_perfil: id }
+    })
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a encontrar o perfil",
+            error: error
+        });
+    })
+}
+
+controller.perfisDelete = async function (req, res){
+    const { id } = req.params;
+    const data = await Perfis.destroy({
+        where: {id_perfil: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "Perfil apagado"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar o Perfil",
+            error: error.message
+        });
+    })
+}
+
+controller.perfisUpdate = async function (req, res){
+    const { id } = req.params;
+    const { id_departamento, id_utilizador, nome, email, morada, telemovel, data_nascimento, distrito } = req.body;
+    const data = await Perfis.update({
+        id_departamento: id_departamento,
+        id_utilizador: id_utilizador,
+        nome: nome,
+        email: email,
+        morada: morada,
+        telemovel: telemovel,
+        data_nascimento: data_nascimento,
+        distrito: distrito,
+        updated_at: getDate()
+    },{
+        where: {id_utilizador: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "AuditLog Apagado"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar o AuditLog",
+            error: error.message
+        });
+    })
+}
+
+module.exports = controller;

@@ -1,14 +1,205 @@
 const Blog = require('../models/Blog');
+const multer = require('multer');
 var sequelize = require('../models/database');
-const Noticia = require('../models/Noticia');
-const Visita = require('../models/Visita');
-const User = require('../models/User');
 
-const controllers = {};
+const controller = {};
 
 sequelize.sync();
 
-controllers.publicacoes_lista = async (req, res) => {
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage }).single('imagem');
+
+function getDate(){
+    let now = new Date();
+    let dd = now.getDate();
+    let mm = now.getMonth() + 1;
+    let yyyy = now.getFullYear();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    let today = `${yyyy}-${mm}-${dd}`;
+    return today;
+}
+
+controller.blogCreate = async function (req, res){
+    upload(req, res, async (err) =>{
+        if(err){
+            return res.status(500).json({
+                success: false,
+                message: "Erro ao fazer upload da imagem",
+                error: err.message
+            });
+        }
+
+        const { id_perfil, tipo, titulo, texto, data_noticia, local_visita, data_visita, duracao_visita, motivo_visita, estado, validador, data_validacao, imagem } = req.body;
+
+        try{
+            const data = await Blog.create({
+                id_perfil: id_perfil,
+                tipo: tipo,
+                titulo: titulo,
+                texto: texto,
+                data_noticia: data_noticia,
+                local_visita: local_visita,
+                data_visita: data_visita,
+                duracao_visita: duracao_visita,
+                motivo_visita: motivo_visita,
+                estado: estado,
+                validador: validador,
+                data_validacao: data_validacao,
+                created_at: getDate(),
+                updated_at: getDate(),
+                imagem:  req.file ? req.file.buffer : null,
+                views: 0
+            })
+
+            res.status(200).json({
+                success: true,
+                message: "Publicação criada no blog",
+                data: data
+            });
+        } catch(error){
+            res.status(500).json({
+                success: false,
+                message: "Erro ao criar a publicação no blog",
+                error: error,
+            });
+        }
+    })
+}
+
+controller.blogList = async function (req, res){
+    const data = await Blog.findAll({order: ['titulo_vaga']})
+    .then(function(data) {
+        const posts = data.map(post => {
+            if(post.imagem){
+                post.imagem = post.imagaem.toString('base64')
+            }
+            return post;
+        })
+        res.status(200).json({
+            success: true,
+            data: posts
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar as publicações",
+            error: error.message
+        });
+    });
+}
+
+
+controller.blogGet = async function (req, res){
+    const { id } = req.params;
+    const data = await Blog.findAll({
+        where: { id_publicacao: id }
+    })
+    .then(function(data) {
+        const posts = data.map(post => {
+            if (post.IMAGEM) {
+                post.IMAGEM = post.IMAGEM.toString('base64');
+            }
+            return post;
+        });
+
+        res.status(200).json({
+            success: true,
+            data: posts
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a encontrar a publicação",
+            error: error
+        });
+    })
+}
+
+controller.blogDelete = async function (req, res){
+    const { id } = req.params;
+    const data = await Blog.destroy({
+        where: {id_publicacao: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "Vaga apagada"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar a publicação",
+            error: error.message
+        });
+    })
+}
+
+controller.blogUpdate = async function (req, res) {
+    upload(req, res, async (err) => {
+        if (err) {
+            return res.status(500).json({
+                success: false,
+                message: "Erro ao fazer upload da imagem",
+                error: err.message
+            });
+        }
+
+        const { id } = req.params;
+        const { tipo, titulo, texto, data_noticia, local_visita, data_visita, duracao_visita, motivo_visita, estado, validador, data_validacao } = req.body;
+
+        try {
+            const blogPost = await Blog.findOne({ where: { id_publicacao: id } });
+            if (!blogPost) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Publicação não encontrada"
+                });
+            }
+
+            let imagem = blogPost.imagem; 
+            if (req.file) {
+                imagem = req.file.buffer;
+            }
+
+            await Blog.update({
+                tipo: tipo,
+                titulo: titulo,
+                texto: texto,
+                data_noticia: data_noticia,
+                local_visita: local_visita,
+                data_visita: data_visita,
+                duracao_visita: duracao_visita,
+                motivo_visita: motivo_visita,
+                estado: estado,
+                validador: validador,
+                data_validacao: data_validacao,
+                updated_at: getDate(),
+                imagem: imagem
+            }, {
+                where: { id_publicacao: id }
+            });
+
+            res.status(200).json({
+                success: true,
+                message: "Publicação atualizada com sucesso"
+            });
+
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: "Erro ao atualizar a publicação",
+                error: error.message
+            });
+        }
+    });
+};
+
+
+/*controllers.publicacoes_lista = async (req, res) => {
     try {
         const noticia = await Noticia.findAll();
         const visita = await Visita.findAll();
@@ -264,4 +455,5 @@ controllers.minhas_publicacoes = async (req, res) => {
         res.status(500).json({ success: false, message: 'Erro ao procurar publicações' });
     }
 }
+    */
 module.exports = controllers;

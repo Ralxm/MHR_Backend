@@ -13,14 +13,16 @@ const Comentarios_Projetos = SequelizeDB.define('comentarios_projetos', {
         references: {
             model: Projetos,
             key: 'id_projeto'
-        }
+        },
+        allowNull: true
     },
     id_ideia: {
         type: Sequelize.INTEGER,
         references: {
             model: Ideia,
             key: 'id_ideia'
-        }
+        },
+        allowNull: true
     },
     autor: Sequelize.INTEGER,
     comentario: Sequelize.STRING(2000),

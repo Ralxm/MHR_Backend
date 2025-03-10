@@ -1,11 +1,9 @@
 const express = require('express');
-
 const router = express.Router();
-
-const ideiasController = require('../controllers/ideiasController');
-
 const multer = require('multer');
 const path = require('path');
+
+const ideiasController = require('../controllers/ideiasController');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -19,7 +17,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/create', upload.single('ficheiroComplementar'), ideiasController.adicionar_ideia);
-router.get('/uploads/files/:ficheiro_complementar', ideiasController.download_file);
+router.get('/uploads/files/:ficheiro_complementar', ideiasController.downlad_file);
 
 router.get('/listEmEstudo', ideiasController.ideias_lista_em_estudo);
 router.get('/listAll', ideiasController.ideias_lista);  

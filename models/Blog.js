@@ -37,5 +37,24 @@ const Blog = SequelizeDB.define('blog', {
     freezeTableName: true
 });
 
+Blog.afterCreate((blog, options) => {
+    return AuditLog.create({
+        utilizador: blog.id_perfil,
+        data: getDate(),
+        tipo_atividade: "Criação Blog",
+        descricao: "Utilizador com ID Perfil " + blog.id_perfil + " criou uma publicação no blog com ID " + blog.id_publicacao + ".",
+    })
+})
+
+function getDate(){
+    let now = new Date();
+    let dd = now.getDate();
+    let mm = now.getMonth() + 1;
+    let yyyy = now.getFullYear();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    let today = `${yyyy}-${mm}-${dd}`;
+    return today;
+}
 
 module.exports = Blog;

@@ -42,4 +42,24 @@ const Ferias = SequelizeDB.define('ferias', {
 Calendario.hasMany(Ferias, { foreignKey: 'id_calendario' });
 Ferias.belongsTo(Calendario, { foreignKey: 'id_calendario' });
 
+Ferias.afterCreate((ferias, options) => {
+    return AuditLog.create({
+        utilizador: ferias.id_perfil,
+        data_atividade: getDate(),
+        tipo_atividade: "Criação Férias",
+        descricao: "Utilizador com ID Perfil " + ferias.id_perfil + " fez registo de férias com ID " + ferias.id_solicitacao + ".",
+    })
+})
+
+function getDate(){
+    let now = new Date();
+    let dd = now.getDate();
+    let mm = now.getMonth() + 1;
+    let yyyy = now.getFullYear();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    let today = `${yyyy}-${mm}-${dd}`;
+    return today;
+}
+
 module.exports = Ferias;

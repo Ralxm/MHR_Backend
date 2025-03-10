@@ -2,11 +2,19 @@ const express = require('express');
 
 const router = express.Router();
 
-const projetosController = require('../controllers/projetosController');
+const controller = require('../controllers/Projetos_Controller');
 
-const multer = require('multer');
-const upload = multer();
-router.get('/listAll', projetosController.projetos_lista);
+
+router.post('/create', controller.projetoCreate);
+router.get('/list', controller.projetoList);
+router.get('/listDesenvolvimento', controller.projetoList_EmDesenvolvimento);
+router.get('/listConcluidos', controller.projetoList_Concluidos);
+router.get('/get/:id', controller.projetoGet);
+router.put('/delete:id', controller.projetoDelete);
+router.post('/update:id', controller.projetoUpdate);
+
+
+/*router.get('/listAll', projetosController.projetos_lista);
 router.get('/listEmDesenvolvimento', projetosController.projetos_lista_em_desenvolvimento);
 router.get('/listDesenvolvidos', projetosController.projetos_lista_desenvolvidos);
 router.get('/list/:id_projeto', projetosController.projetos_detalhes);
@@ -21,6 +29,6 @@ router.post('/create/comentarios/:id_projeto', projetosController.projetos_comen
 router.post('/create/pontosBloqueio/:id_projeto', projetosController.projetos_pontosBloqueio);
 router.put('/update/concluirObjetivos/:id_projeto', projetosController.projetos_concluirObjetivos);
 router.put('/update/concluirProjeto/:id_projeto', projetosController.projetos_concluirProjeto);
-router.put('/update/concluirPontosBloqueio/:id_projeto', projetosController.projetos_concluirPontosBloqueio);
+router.put('/update/concluirPontosBloqueio/:id_projeto', projetosController.projetos_concluirPontosBloqueio);*/
 
 module.exports = router;

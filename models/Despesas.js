@@ -15,21 +15,24 @@ const Despesas = SequelizeDB.define('despesas', {
         references: {
             model: Departamento,
             key: 'id_departamento'
-        }
+        },
+        allowNull: true
     },
     id_projeto: {
         type: Sequelize.INTEGER,
         references: {
             model: Projetos,
             key: 'id_projeto'
-        }
+        },
+        allowNull: true
     },
     id_perfil: {
         type: Sequelize.INTEGER,
         references: {
             model: Perfis,
             key: 'id_perfil'
-        }
+        },
+        allowNull: true
     },
     data: Sequelize.DATE,
     descricao: Sequelize.TEXT,

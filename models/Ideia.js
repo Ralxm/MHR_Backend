@@ -36,6 +36,26 @@ Ideia.belongsTo(User, { foreignKey: 'id_user' });
 Projetos.hasMany(Ideia, { foreignKey: 'id_projeto' });
 Ideia.belongsTo(Projetos, { foreignKey: 'id_projeto' });
 
+Ideia.afterCreate((ideia, options) => {
+    return AuditLog.create({
+        utilizador: ideia.id_perfil,
+        data_atividade: getDate(),
+        tipo_atividade: "Criação Férias",
+        descricao: "Utilizador com ID Perfil " + ideia.id_perfil + " fez registo de uma ideia com ID " + ideia.id_ideia + ".",
+    })
+})
+
+function getDate(){
+    let now = new Date();
+    let dd = now.getDate();
+    let mm = now.getMonth() + 1;
+    let yyyy = now.getFullYear();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    let today = `${yyyy}-${mm}-${dd}`;
+    return today;
+}
+
 
 
 module.exports = Ideia;

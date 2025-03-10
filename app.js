@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const sequelize = require('./model/database');
+const sequelize = require('./models/database');
 const Sequelize = require('sequelize')
 const middleware = require('./middleware')
 
@@ -23,7 +23,6 @@ const reembolsosRoute = require('./routes/reembolsosRoute');
 const vagaRoute = require('./routes/vagaRoute');
 const userVisitanteRoute = require('./routes/userVisitanteRoute');
 const cors = require('cors');
-const sequelize = require('./models/database');
 const bodyParser = require('body-parser');
 const path = require('path');
 require('./cronJobs');
@@ -60,7 +59,8 @@ const corsOptions = {
 app.set('port', process.env.PORT || 8080);
 app.use(cors(corsOptions));
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/ficheiros', express.static(path.join(__dirname, 'ficheiros')));
+//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
