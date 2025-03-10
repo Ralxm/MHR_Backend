@@ -1,14 +1,192 @@
-const Despesas = require('../models/Despesas');
-const Projetos = require('../models/Projetos');
-const User = require('../models/User');
-const Reembolsos = require('../models/Reembolsos');
+const Despesas = require('../models/Despesas');;
 var sequelize = require('../models/database');
 
-const controllers = {};
+const controller = {};
 
 sequelize.sync();
 
-controllers.despesas_adicionar = async (req, res) => {
+function getDate(){
+    let now = new Date();
+    let dd = now.getDate();
+    let mm = now.getMonth() + 1;
+    let yyyy = now.getFullYear();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    let today = `${yyyy}-${mm}-${dd}`;
+    return today;
+}
+
+controller.despesasCreate = async function (req, res){
+    const { id_departamento, id_projeto, id_perfil, _data, descricao, valor, validador, estado, reembolsado_por, comentarios} = req.body;
+    const anexo = req.file ? req.file.path : null;
+
+    const data = await Despesas.create({
+        id_departamento: id_departamento,
+        id_projeto: id_projeto,
+        id_perfil: id_perfil,
+        data: _data,
+        descricao: descricao,
+        valor: valor,
+        anexo: anexo,
+        validador: validador,
+        estado: estado,
+        reembolsado_por: reembolsado_por,
+        comentarios: comentarios,
+        created_at: getDate(),
+        updated_at: getDate()
+    })
+    .then(function(data){
+        res.status(200).json({
+            success: true,
+            message: "Despesa criado",
+            data: data
+        })
+    })
+    .catch(error =>
+        res.status(500).json({
+            success: false,
+            message: "Erro a criar a Despesa",
+            error: error.message
+        })
+    )
+}
+
+controller.despesasList = async function (req, res){
+    try {
+        const data = await Despesas.findAll({
+            order: ['data']
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as despesas",
+            error: error.message
+        });
+    }
+}
+
+controller.despesasGet = async function (req, res){
+    const { id } = req.params;
+
+    try {
+        const data = await Despesas.findAll({
+            where: { id_despesa: id }
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao encontrar a despesa",
+            error: error.message
+        });
+    }
+}
+
+controller.despesasDelete = async function (req, res){
+    const { id } = req.params;
+    const data = await Despesas.destroy({
+        where: {id_despesa: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "Despesa apagada"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar a despesa",
+            error: error.message
+        });
+    })
+}
+
+controller.despesasUpdate = async function (req, res) {
+    const { id } = req.params;
+    const { id_departamento, id_projeto, id_perfil, _data, descricao, valor, validador, estado, reembolsado_por, comentarios} = req.body;
+
+    try {
+        //Encontra o comentário que vamos atualizar
+        const comentarioProjeto = await Despesas.findOne({ where: { id_despesa: id } });
+
+        //Se não encontrar o comentário responde com um erro
+        if (!comentarioProjeto) {
+            return res.status(404).json({
+                success: false,
+                message: "Despesa não encontrada"
+            });
+        }
+
+        //Esta parte do código verifica se o comentario já tem um ficheiro. Se sim, apaga-o e troca-o por um novo.
+        //Se não for inserido nenhum ficheiro diferente/novo na atualização então o ficheiro anterior mantém-se
+        let anexo = comentarioProjeto.anexo;
+        if (req.file) {
+            if (anexo) {
+                fs.unlinkSync(path.resolve(anexo));
+            }
+            anexo = req.file.path;
+        }
+
+        await Comentarios_Projetos.update({
+            id_departamento: id_departamento,
+            id_projeto: id_projeto,
+            id_perfil: id_perfil,
+            data: _data,
+            descricao: descricao,
+            valor: valor,
+            anexo: anexo,
+            validador: validador,
+            estado: estado,
+            reembolsado_por: reembolsado_por,
+            comentarios: comentarios,
+            created_at: getDate(),
+            updated_at: getDate()
+        }, {
+            where: { id_despesa: id }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Despesa atualizado com sucesso"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao atualizar a despesa",
+            error: error.message
+        });
+    }
+};
+
+
+/*controllers.despesas_adicionar = async (req, res) => {
     const { id_user, data, descricao, valor, id_projeto } = req.body;
 
     try {
@@ -282,4 +460,6 @@ controllers.despesas_rejeitar = async (req, res) => {
         });
     }
 }
-module.exports = controllers;
+    */
+
+module.exports = controller;

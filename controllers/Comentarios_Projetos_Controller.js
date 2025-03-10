@@ -78,7 +78,7 @@ controller.comentarioProjetoGet = async function (req, res){
 
     try {
         const data = await Comentarios_Projetos.findAll({
-            where: { id_projeto: id }
+            where: { id_comentario_projeto: id }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -105,7 +105,7 @@ controller.comentarioProjetoGet = async function (req, res){
 controller.comentarioProjetoDelete = async function (req, res){
     const { id } = req.params;
     const data = await Comentarios_Projetos.destroy({
-        where: {id_projeto: id}
+        where: {id_comentario_projeto: id}
     })
     .then(function() {
         res.status(200).json({
@@ -128,7 +128,7 @@ controller.comentarioProjetoUpdate = async function (req, res) {
 
     try {
         //Encontra o comentário que vamos atualizar
-        const comentarioProjeto = await Comentarios_Projetos.findOne({ where: { id_utilizador: id } });
+        const comentarioProjeto = await Comentarios_Projetos.findOne({ where: { id_comentario_projeto: id } });
 
         //Se não encontrar o comentário responde com um erro
         if (!comentarioProjeto) {
