@@ -1,15 +1,261 @@
-const Ideias = require('../models/Ideia');
-const User = require('../models/User');
-const Projetos = require('../models/Projetos');
+const Ideia = require('../models/Ideia');
 var sequelize = require('../models/database');
-const path = require('path');
-const fs = require('fs');
 
-const controllers = {};
+const controller = {};
 
 sequelize.sync();
 
-controllers.adicionar_ideia = async (req, res) => {
+function getDate(){
+    let now = new Date();
+    let dd = now.getDate();
+    let mm = now.getMonth() + 1;
+    let yyyy = now.getFullYear();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    let today = `${yyyy}-${mm}-${dd}`;
+    return today;
+}
+
+controller.ideiaCreate = async function (req, res){
+    const { id_perfil, titulo_ideia, descricao, estado, validador, comentarios} = req.body;
+    const ficheiro_complementar = req.file ? req.file.path : null;
+
+    const data = await Ideia.create({
+        id_perfil: id_perfil,
+        titulo_ideia: titulo_ideia,
+        descricao: descricao,
+        estado: estado,
+        ficheiro_complementar: ficheiro_complementar,
+        validador: validador,
+        comentarios: comentarios,
+        created_at: getDate(),
+        updated_at: getDate()
+    })
+    .then(function(data){
+        res.status(200).json({
+            success: true,
+            message: "Ideia criada",
+            data: data
+        })
+    })
+    .catch(error =>
+        res.status(500).json({
+            success: false,
+            message: "Erro a criar a ideia",
+            error: error.message
+        })
+    )
+}
+
+controller.ideiaList = async function (req, res){
+    try {
+        const data = await Ideia.findAll({
+            order: ['titulo_ideia']
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            ficheiro_complementar: item.ficheiro_complementar ? `${req.protocol}://${req.get('host')}/${item.ficheiro_complementar}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as ideias",
+            error: error.message
+        });
+    }
+}
+
+controller.ideiaList_EmAnalise = async function (req, res){
+    try {
+        const data = await Ideia.findAll({
+            order: ['titulo_ideia']
+        },{
+            where: {estado: "Em análise"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            ficheiro_complementar: item.ficheiro_complementar ? `${req.protocol}://${req.get('host')}/${item.ficheiro_complementar}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as ideias",
+            error: error.message
+        });
+    }
+}
+
+controller.ideiaList_Aprovada = async function (req, res){
+    const data = await Ideia.findAll({order: ['titulo_projeto']},
+        {
+            where: {estado: "Aprovada"}
+        }
+    )
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os Projetos",
+            error: error.message
+        });
+    });
+}
+
+controller.ideiaList_Rejeitada = async function (req, res){
+    try {
+        const data = await Ideia.findAll({
+            order: ['titulo_ideia']
+        },{
+            where: {estado: "Rejeitada"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            ficheiro_complementar: item.ficheiro_complementar ? `${req.protocol}://${req.get('host')}/${item.ficheiro_complementar}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as ideias",
+            error: error.message
+        });
+    }
+}
+
+controller.ideiaGet = async function (req, res){
+    const { id } = req.params;
+
+    try {
+        const data = await Ideia.findAll({
+            where: { id_ideia: id }
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            ficheiro_complementar: item.ficheiro_complementar ? `${req.protocol}://${req.get('host')}/${item.ficheiro_complementar}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao encontrar a ideia",
+            error: error.message
+        });
+    }
+}
+
+controller.ideiaDelete = async function (req, res){
+    const { id } = req.params;
+    const data = await Ideia.destroy({
+        where: {id_ideia: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "Projeto apagado"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar o Projeto",
+            error: error.message
+        });
+    })
+}
+
+controller.ideiaUpdate = async function (req, res){
+    const { id } = req.params;
+    const { titulo_ideia, descricao, estado, validador, comentarios} = req.body;
+
+    try {
+        //Encontra a ideia que vamos atualizar
+        const ideia = await Ideia.findOne({ where: { id_ideia: id } });
+
+        //Se não encontrar o comentário responde com um erro
+        if (!ideia) {
+            return res.status(404).json({
+                success: false,
+                message: "Ideia não encontrada"
+            });
+        }
+
+        //Esta parte do código verifica se o comentario já tem um ficheiro. Se sim, apaga-o e troca-o por um novo.
+        //Se não for inserido nenhum ficheiro diferente/novo na atualização então o ficheiro anterior mantém-se
+        let ficheiro_complementar = ideia.ficheiro_complementar;
+        if (req.file) {
+            if (ficheiro_complementarxo) {
+                fs.unlinkSync(path.resolve(ficheiro_complementar));
+            }
+            ficheiro_complementar = req.file.path;
+        }
+
+        await Ideia.update({
+            titulo_ideia: titulo_ideia,
+            descricao: descricao,
+            estado: estado,
+            ficheiro_complementar: ficheiro_complementar,
+            validador: validador,
+            comentarios: comentarios,
+            updated_at: getDate()
+        }, {
+            where: { id_ideia: id }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Ideia atualizada com sucesso"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao atualizar a ideia",
+            error: error.message
+        });
+    }
+}
+
+
+/*controllers.adicionar_ideia = async (req, res) => {
 
     const { id_user, titulo_ideia, descricao } = req.body;
     const ficheiro_complementar = req.file ? req.file.path : null;
@@ -299,5 +545,5 @@ controllers.rejeitar_ideia = async (req, res) => {
         });
     res.json({ success: true, data: data });
 }
-
+*/
 module.exports = controllers;

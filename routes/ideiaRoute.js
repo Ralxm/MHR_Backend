@@ -7,7 +7,7 @@ const ideiasController = require('../controllers/ideiasController');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, path.join('uploads/files/'));
+        cb(null, path.join('ficheiros/ideias/'));
     },
     filename: function(req, file, cb) {
         cb(null, file.originalname);
@@ -16,7 +16,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.post('/create', upload.single('ficheiroComplementar'), ideiasController.adicionar_ideia);
+router.post('/create', upload.single('ficheiro_complementar'), controller.ideiaCreate);
+router.get('/list', controller.ideiaList);
+router.get('/listAnalise', controller.ideiaList_EmDesenvolvimento);
+router.get('/listAprovada', controller.ideiaList_Aprovada);
+router.get('/listRejeitada', controller.ideiaList_Rejeitada);
+router.get('/get/:id', controller.ideiaGet);
+router.put('/delete:id', controller.ideiaDelete);
+router.post('/update:id', controller.ideiaUpdate);
+
+/*router.post('/create', upload.single('ficheiroComplementar'), ideiasController.adicionar_ideia);
 router.get('/uploads/files/:ficheiro_complementar', ideiasController.downlad_file);
 
 router.get('/listEmEstudo', ideiasController.ideias_lista_em_estudo);
@@ -27,5 +36,6 @@ router.get('/list/:id_user', ideiasController.ideias_lista_user);
 router.put('/reformular/:id_ideia', upload.single('ficheiro_complementar'), ideiasController.ideias_reformular);
 router.get('/list/:id_ideia', ideiasController.ideias_detalhes);
 router.put('/update/:id_ideia',upload.single('ficheiro_complementar'), ideiasController.ideias_atualizar);
+*/
 
 module.exports = router;

@@ -52,6 +52,8 @@ controller.comentarioProjetoList = async function (req, res){
             order: ['titulo_projeto']
         });
 
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
         const modifiedData = data.map(item => ({
             ...item.toJSON(),
             anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
