@@ -8,7 +8,7 @@ const controller = require('../controllers/Comentarios_Projetos_Controller');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'ficheiros/comentarios_projetos');
+        cb(null, 'ficheiros/comentarios_projetos/');
     },
     filename: function (req, file, cb) {
         cb(null, path.extname(file.originalname));

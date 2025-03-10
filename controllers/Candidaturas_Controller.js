@@ -1,10 +1,5 @@
 const Candidaturas = require('../models/Candidaturas');
-const User = require('../models/User');
-const Vaga = require('../models/Vaga');
 var sequelize = require('../models/database');
-const userVisitante = require('../models/Perfil_visitante');
-const crypto = require('crypto');
-const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const config = require('../config');
 
@@ -12,7 +7,180 @@ const controllers = {};
 
 sequelize.sync();
 
-controllers.upload_file = async (req, res) => {
+function getDate(){
+    let now = new Date();
+    let dd = now.getDate();
+    let mm = now.getMonth() + 1;
+    let yyyy = now.getFullYear();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    let today = `${yyyy}-${mm}-${dd}`;
+    return today;
+}
+
+controller.candidaturasCreate = async function (req, res){
+    const { id_vaga, id_utilizador, data_submissao, telemovel, email, status, responsavel, resultado } = req.body;
+    const curriculo = req.file ? req.file.path : null;
+
+    const data = await Candidaturas.create({
+        id_vaga: id_vaga,
+        id_utilizador: id_utilizador,
+        data_submissao: data_submissao,
+        curriculo: curriculo,
+        telemovel: telemovel,
+        email: email,
+        status: status,
+        responsavel: responsavel,
+        resultado: resultado,
+        created_at: getDate(),
+        updated_at: getDate()
+    })
+    .then(function(data){
+        res.status(200).json({
+            success: true,
+            message: "Candidatura criada",
+            data: data
+        })
+    })
+    .catch(error =>
+        res.status(500).json({
+            success: false,
+            message: "Erro a criar a candidatura",
+            error: error.message
+        })
+    )
+}
+
+controller.candidaturasList = async function (req, res){
+    try {
+        const data = await Candidaturas.findAll({
+            order: ['data_submissao']
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            curriculo: item.curriculo ? `${req.protocol}://${req.get('host')}/${item.curriculo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as candidaturas",
+            error: error.message
+        });
+    }
+}
+
+controller.candidaturasGet = async function (req, res){
+    const { id } = req.params;
+
+    try {
+        const data = await Candidaturas.findAll({
+            where: { id_candidatura: id }
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            curriculo: item.curriculo ? `${req.protocol}://${req.get('host')}/${item.curriculo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao encontrar a candidatura",
+            error: error.message
+        });
+    }
+}
+
+controller.candidaturasDelete = async function (req, res){
+    const { id } = req.params;
+    const data = await Candidaturas.destroy({
+        where: {id_candidatura: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "Candidatura apagada"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar a candidatura",
+            error: error.message
+        });
+    })
+}
+
+controller.candidaturasUpdate = async function (req, res) {
+    const { id } = req.params;
+    const { comentario } = req.body;
+    const { telemovel, email, status, responsavel, resultado } = req.body;
+    try {
+        //Encontra o comentário que vamos atualizar
+        const candidatura = await Candidaturas.findOne({ where: { id_candidatura: id } });
+        
+        //Se não encontrar o comentário responde com um erro
+        if (!candidatura) {
+            return res.status(404).json({
+                success: false,
+                message: "Candidatura não encontrada"
+            });
+        }
+
+        //Esta parte do código verifica se o comentario já tem um ficheiro. Se sim, apaga-o e troca-o por um novo.
+        //Se não for inserido nenhum ficheiro diferente/novo na atualização então o ficheiro anterior mantém-se
+        let curriculo = candidatura.curriculo;
+        if (req.file) {
+            if (curriculo) {
+                fs.unlinkSync(path.resolve(curriculo));
+            }
+            curriculo = req.file.path;
+        }
+
+        await Comentarios_Projetos.update({
+            telemovel: telemovel,
+            email: email,
+            status: status,
+            responsavel: responsavel,
+            resultado: resultado,
+            curriculo: curriculo,
+            updated_at: getDate()
+        }, {
+            where: { id_candidatura: id }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Candidatura atualizado com sucesso"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao atualizar a candidatura",
+            error: error.message
+        });
+    }
+};
+
+
+/*controllers.upload_file = async (req, res) => {
     const { id_vaga, nome_candidato, informacoes_contacto } = req.body;
     const curriculo = req.file ? req.file.path : null;
 
@@ -279,7 +447,7 @@ controllers.candidaturas_lista_user_visitante = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
-
+*/
 
 
 module.exports = controllers;
