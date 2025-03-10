@@ -14,14 +14,16 @@ const Linha_Temporal = SequelizeDB.define('linha_temporal', {
         references: {
             model: Ideia,
             key: 'id_ideia'
-        }
+        },
+        allowNull: true
     },
     id_projeto: {
         type: Sequelize.INTEGER,
         references: {
             model: Projetos,
             key: 'id_projeto'
-        }
+        },
+        allowNull: true
     },
     tipo: Sequelize.STRING(50),
     descricao: Sequelize.TEXT,
