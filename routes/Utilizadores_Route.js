@@ -3,6 +3,7 @@ const router = express.Router();
 
 const controller = require('../controllers/Utilizadores_Controller');
 
+router.post('/login', controller.utilizadoresLogin);
 router.post('/create', controller.utilizadoresCreate);
 router.get('/list', controller.utilizadoresList);
 router.get('/listTipo/:id', controller.utilizadoresListTipo); //Lista todos os utilizadores de um determinado tipo (Admin, Manager, Interno, Externo, Visitante)
@@ -12,5 +13,8 @@ router.put('/delete/:id', controller.utilizadoresDelete);
 router.post('/update/:id', controller.utilizadoresDelete);
 router.post('/ativar/:id', controller.utilizadoresAtivarConta);
 router.post('/desativar/:id', controller.utilizadoresDesativarConta);
+
+router.post('/resgatepassword', controller.ResgatePassword);
+router.post('/resetpassword', controller.ResetPassword);
 
 module.exports = router;

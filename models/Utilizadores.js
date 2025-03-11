@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize');
 const SequelizeDB = require('./database');
 const Tipo_Utilizador = require('./Tipo_Utilizador')
-const Perfis = require('./Perfis')
 const bcrypt = require('bcrypt')
 
 const Utilizadores = SequelizeDB.define('utilizadores', {
@@ -17,7 +16,10 @@ const Utilizadores = SequelizeDB.define('utilizadores', {
             key: 'id_tipo'
         }
     },
-    nome_utilizador: Sequelize.STRING(50),
+    nome_utilizador: {
+        type: Sequelize.STRING(50),
+        unique: true,
+    },
     pass: Sequelize.STRING(256),
     estado: Sequelize.STRING(50), //Ativa, Desativada
     token_resgate: Sequelize.STRING(6),
