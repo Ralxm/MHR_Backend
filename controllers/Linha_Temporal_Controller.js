@@ -56,6 +56,42 @@ controller.linhaTemporalList = async function (req, res){
     });
 }
 
+controller.linhaTemporalListProjeto = async function (req, res){
+    const { id } = req.params;
+    const data = await Linha_Temporal.findAll({order: ['created_at']}, {where: {id_projeto: id}})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os registos",
+            error: error.message
+        });
+    });
+}
+
+controller.linhaTemporalListIdeia = async function (req, res){
+    const { id } = req.params;
+    const data = await Linha_Temporal.findAll({order: ['created_at']}, {where: {id_ideia: id}})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os registos",
+            error: error.message
+        });
+    });
+}
+
 controller.linhaTemporalGet = async function (req, res){
     const { id } = req.params;
     const data = await Linha_Temporal.findAll({

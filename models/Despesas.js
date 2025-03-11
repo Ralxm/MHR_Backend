@@ -39,7 +39,7 @@ const Despesas = SequelizeDB.define('despesas', {
     valor: Sequelize.DECIMAL(10, 2),
     anexo: Sequelize.TEXT,
     validador: Sequelize.INTEGER,
-    estado: Sequelize.STRING(50),
+    estado: Sequelize.STRING(50), //Aprovada, Em análise, Rejeitada
     reembolsado_por: Sequelize.INTEGER,
     comentarios: Sequelize.STRING(2000),
     created_at: Sequelize.DATE,

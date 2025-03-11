@@ -6,6 +6,10 @@ const controller = require('../controllers/Ferias_Controller');
 
 router.post('/create', controller.feriasCreate);
 router.get('/list', controller.feriasList);
+router.get('/listAprovadas', controller.feriasListAprovadas); //Lista todas as férias aprovadas
+router.get('/listAnalise', controller.feriasListEmAnalise); //Lista todas as férias por aprovar
+router.get('/listRejeitadas', controller.feriasListRejeitadas); //Lista todas as férias rejeitadas
+router.get('/listUser/:id', controller.feriasListUser); //Lista todas as férias pedidas por um utilizador
 router.get('/get/:id', controller.feriasGet);
 router.put('/delete/:id', controller.feriasDelete);
 router.post('/update/:id', controller.feriasUpdate);

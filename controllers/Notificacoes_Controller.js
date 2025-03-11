@@ -8,8 +8,7 @@ var sequelize = require('../models/database');
 
 const controllers = {};
 
-controllers.notificacoes_lista = async (req, res) => {
-
+controllers.notificacoesListManager = async (req, res) => {
     try {
         const publicacoesCount = await Blog.count({ where: { estado: 'Em avaliação' } });
         const despesasCount = await Despesas.count({ where: { estado: 'Pendente' } });
@@ -25,6 +24,29 @@ controllers.notificacoes_lista = async (req, res) => {
             ferias: feriasCount,
             faltas: faltasCount,
             vagas: vagasCount,
+            ideias: ideiasCount,
+        });
+
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+controllers.notificacoesListManager = async (req, res) => {
+    const { id } = req.params
+    try {
+        const publicacoesCount = await Blog.count({ where: { estado: 'Em avaliação', id_perfil: id} });
+        const despesasCount = await Despesas.count({ where: { estado: 'Pendente', id_perfil: id } });
+        const feriasCount = await Ferias.count({ where: { estado: 'Pendente', id_perfil: id } });
+        const faltasCount = await Faltas.count({ where: { estado: 'Pendente', id_perfil: id } });
+        const ideiasCount = await Ideias.count({ where: { estado: 'Em análise', id_perfil: id } });
+        
+        res.json({
+            success: true,
+            publicacoes: publicacoesCount,
+            despesas: despesasCount,
+            ferias: feriasCount,
+            faltas: faltasCount,
             ideias: ideiasCount,
         });
 

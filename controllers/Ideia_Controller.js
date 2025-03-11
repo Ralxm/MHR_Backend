@@ -151,6 +151,36 @@ controller.ideiaList_Rejeitada = async function (req, res){
     }
 }
 
+controller.ideiaListUser = async function (req, res){
+    const { id } = req.params;
+    try {
+        const data = await Ideia.findAll({
+            order: ['titulo_ideia']
+        },{
+            where: {id_perfil: id}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            ficheiro_complementar: item.ficheiro_complementar ? `${req.protocol}://${req.get('host')}/${item.ficheiro_complementar}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as ideias",
+            error: error.message
+        });
+    }
+}
+
 controller.ideiaGet = async function (req, res){
     const { id } = req.params;
 

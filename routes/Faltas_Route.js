@@ -18,6 +18,13 @@ const upload = multer({ storage: storage });
 
 router.post('/create', upload.single('anexo'), controller.faltasCreate);
 router.get('/list', controller.faltasList);
+router.get('/listUser/:id', controller.faltasListUser); //Lista todas as faltas dadas por um utilizador
+router.get('/listTipo/:id', controller.faltasListTipo); //Lista todas as faltas dadas com um certo tipo de falta atribuido
+router.get('/listAprovadasValidador/:id', controller.faltasListAprovadasManager); //Lista todas as faltas aprovadas por um dado manager
+router.get('/listRejeitadasValidador/:id', controller.faltasListRejeitadasManager); //Lista todas as faltas aprovadas por um dado manager
+router.get('/listAprovadas/:id', controller.faltasListAprovadas); //Lista todas as faltas aprovadas
+router.get('/listRejeitadas/:id', controller.faltasListRejeitadas); //Lista todas as faltas rejeitadas
+router.get('/listAnalise/:id', controller.faltasListAnalise); //Lista todas as faltas em análise
 router.get('/get/:id', controller.faltasGet);
 router.put('/delete:id', controller.faltasDelete);
 router.post('/update:id', upload.single('anexo'), controller.faltasUpdate);

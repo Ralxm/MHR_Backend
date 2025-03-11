@@ -76,6 +76,213 @@ controller.faltasList = async function (req, res){
     }
 }
 
+controller.faltasListUser = async function (req, res){
+    const { id } = req.params
+    try {
+        const data = await Faltas.findAll({
+            order: ['data_falta']
+        },{
+            where: {id_perfil: id}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            justificacao: item.justificacao ? `${req.protocol}://${req.get('host')}/${item.justificacao}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as faltas",
+            error: error.message
+        });
+    }
+}
+
+controller.faltasListTipo = async function (req, res){
+    const { id } = req.params
+    try {
+        const data = await Faltas.findAll({
+            order: ['data_falta']
+        },{
+            where: {id_tipofalta: id}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            justificacao: item.justificacao ? `${req.protocol}://${req.get('host')}/${item.justificacao}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as faltas",
+            error: error.message
+        });
+    }
+}
+
+controller.faltasListAprovadasManager = async function (req, res){
+    const { id } = req.params
+    try {
+        const data = await Faltas.findAll({
+            order: ['data_falta']
+        },{
+            where: {validador: id, estado: "Aprovada"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            justificacao: item.justificacao ? `${req.protocol}://${req.get('host')}/${item.justificacao}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as faltas",
+            error: error.message
+        });
+    }
+}
+
+controller.faltasListRejeitadasManager = async function (req, res){
+    const { id } = req.params
+    try {
+        const data = await Faltas.findAll({
+            order: ['data_falta']
+        },{
+            where: {validador: id, estado: "Rejeitada"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            justificacao: item.justificacao ? `${req.protocol}://${req.get('host')}/${item.justificacao}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as faltas",
+            error: error.message
+        });
+    }
+}
+
+controller.faltasListAprovadas = async function (req, res){
+    try {
+        const data = await Faltas.findAll({
+            order: ['data_falta']
+        },{
+            where: {estado: "Aprovadas"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            justificacao: item.justificacao ? `${req.protocol}://${req.get('host')}/${item.justificacao}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as faltas",
+            error: error.message
+        });
+    }
+}
+
+controller.faltasListRejeitadas = async function (req, res){
+    try {
+        const data = await Faltas.findAll({
+            order: ['data_falta']
+        },{
+            where: {estado: "Rejeitadas"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            justificacao: item.justificacao ? `${req.protocol}://${req.get('host')}/${item.justificacao}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as faltas",
+            error: error.message
+        });
+    }
+}
+
+controller.faltasListAnalise = async function (req, res){
+    try {
+        const data = await Faltas.findAll({
+            order: ['data_falta']
+        },{
+            where: {estado: "Em análise"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            justificacao: item.justificacao ? `${req.protocol}://${req.get('host')}/${item.justificacao}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as faltas",
+            error: error.message
+        });
+    }
+}
+
 controller.faltasGet = async function (req, res){
     const { id } = req.params;
 

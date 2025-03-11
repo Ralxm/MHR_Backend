@@ -6,7 +6,7 @@ const controller = require('../controllers/Calendario_Controller');
 
 router.post('/create', controller.calendarioCreate);
 router.get('/list', controller.calendarioList);
-router.post('/listUser/:id', controller.calendarioListUser);
+router.post('/listUser/:id', controller.calendarioListUser); //Mostra o calendário de um dado utilizador
 router.get('/get/:id', controller.calendarioGet);
 router.put('/delete/:id', controller.calendarioDelete);
 router.post('/update/:id', controller.calendarioUpdate);

@@ -76,6 +76,183 @@ controller.despesasList = async function (req, res){
     }
 }
 
+controller.despesasListPorUser = async function (req, res){
+    const { id } = req.params;
+    try {
+        const data = await Despesas.findAll({
+            order: ['data']
+        },{
+            where: {id_perfil: id}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as despesas",
+            error: error.message
+        });
+    }
+}
+
+controller.despesasListAprovadasPorUser = async function (req, res){
+    const { id } = req.params;
+    try {
+        const data = await Despesas.findAll({
+            order: ['data']
+        },{
+            where: {validador: id, estado: "Aprovada"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as despesas",
+            error: error.message
+        });
+    }
+}
+
+controller.despesasListAprovadas = async function (req, res){
+    try {
+        const data = await Despesas.findAll({
+            order: ['data']
+        },{
+            where: {estado: "Aprovada"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as despesas",
+            error: error.message
+        });
+    }
+}
+
+controller.despesasListRejeitadas = async function (req, res){
+    try {
+        const data = await Despesas.findAll({
+            order: ['data']
+        },{
+            where: {estado: "Rejeitada"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as despesas",
+            error: error.message
+        });
+    }
+}
+
+controller.despesasListPorAprovar = async function (req, res){
+    try {
+        const data = await Despesas.findAll({
+            order: ['data']
+        },{
+            where: {estado: "Por Aprovar"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as despesas",
+            error: error.message
+        });
+    }
+}
+
+controller.despesasListRejeitadasPorUser = async function (req, res){
+    const { id } = req.params;
+    try {
+        const data = await Despesas.findAll({
+            order: ['data']
+        },{
+            where: {validador: id, estado: "Rejeitada"}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as despesas",
+            error: error.message
+        });
+    }
+}
+
 controller.despesasGet = async function (req, res){
     const { id } = req.params;
 

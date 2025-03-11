@@ -18,9 +18,10 @@ const upload = multer({ storage: storage });
 
 router.post('/create', upload.single('ficheiro_complementar'), controller.ideiaCreate);
 router.get('/list', controller.ideiaList);
-router.get('/listAnalise', controller.ideiaList_EmAnalise);
-router.get('/listAprovada', controller.ideiaList_Aprovada);
-router.get('/listRejeitada', controller.ideiaList_Rejeitada);
+router.get('/listAnalise', controller.ideiaList_EmAnalise); //Lista todas as ideias em análise
+router.get('/listAprovada', controller.ideiaList_Aprovada); //Lista todas as ideias aprovadas
+router.get('/listRejeitada', controller.ideiaList_Rejeitada); //Lista todas as ideias rejeitadas
+router.get('/listUser/:id', controller.ideiaListUser); //Lista todas as ideias sugeridas por um dado utilizador
 router.get('/get/:id', controller.ideiaGet);
 router.put('/delete:id', controller.ideiaDelete);
 router.post('/update:id', controller.ideiaUpdate);
