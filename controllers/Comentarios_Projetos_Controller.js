@@ -4,8 +4,6 @@ const path = require('path');
 var sequelize = require('../models/database');
 const controller = {};
 
-sequelize.sync();
-
 function getDate(){
     let now = new Date();
     let dd = now.getDate();
@@ -50,6 +48,96 @@ controller.comentarioProjetoList = async function (req, res){
     try {
         const data = await Comentarios_Projetos.findAll({
             order: ['titulo_projeto']
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar os Projetos",
+            error: error.message
+        });
+    }
+}
+
+controller.comentarioProjetoListPorProjeto = async function (req, res){
+    const { id } = req.params;
+    try {
+        const data = await Comentarios_Projetos.findAll({
+            order: ['titulo_projeto']
+        },{
+            where: {id_comentario_projeto: id}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar os Projetos",
+            error: error.message
+        });
+    }
+}
+
+controller.comentarioProjetoListPorIdeia = async function (req, res){
+    const { id } = req.params;
+    try {
+        const data = await Comentarios_Projetos.findAll({
+            order: ['titulo_projeto']
+        },{
+            where: {id_comentario_projeto: id}
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar os Projetos",
+            error: error.message
+        });
+    }
+}
+
+controller.comentarioProjetoListPorUser = async function (req, res){
+    const { id } = req.params;
+    try {
+        const data = await Comentarios_Projetos.findAll({
+            order: ['titulo_projeto']
+        },{
+            where: {id_comentario_projeto: id}
         });
 
         //Esta parte do código altera, na resposta, a variável anexo

@@ -3,8 +3,6 @@ var sequelize = require('../models/database');
 
 const controller = {};
 
-sequelize.sync();
-
 function getDate(){
     let now = new Date();
     let dd = now.getDate();
@@ -546,4 +544,4 @@ controllers.rejeitar_ideia = async (req, res) => {
     res.json({ success: true, data: data });
 }
 */
-module.exports = controllers;
+module.exports = controller;

@@ -3,8 +3,6 @@ var sequelize = require('../models/database');
 
 const controller = {};
 
-sequelize.sync();
-
 controller.calendarioCreate = async (req, res) => {
     const { id_perfil, _data, descricao, dias_ferias_ano_atual, dias_ferias_ano_anterior } = req.body;
     const data = await Calendario.create({
@@ -274,4 +272,4 @@ controllers.numero_dias_ferias_restantes = async (req, res) => {
 }
     */
 
-module.exports = controllers;
+module.exports = controller;

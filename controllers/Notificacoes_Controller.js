@@ -8,8 +8,6 @@ var sequelize = require('../models/database');
 
 const controllers = {};
 
-sequelize.sync();
-
 controllers.notificacoes_lista = async (req, res) => {
 
     try {

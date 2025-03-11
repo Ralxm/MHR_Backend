@@ -3,8 +3,6 @@ var sequelize = require('../models/database');
 
 const controller = {};
 
-sequelize.sync();
-
 controller.departamentoCreate = async (req, res) => {
     const { nome_departamento, descricao, responsavel_departamento } = req.body;
     const data = await Departamento.create({

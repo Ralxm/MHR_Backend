@@ -4,11 +4,11 @@ const router = express.Router();
 
 const controller = require('../controllers/Ferias_Controller');
 
-router.post('/create', controller.tipoFaltasCreate);
-router.get('/list', controller.tipoFaltasList);
-router.get('/get/:id', controller.tipoFaltasGet);
-router.put('/delete/:id', controller.tipoFaltasDelete);
-router.put('/update/:id', controller.tipoFaltasUpdate);
+router.post('/create', controller.feriasCreate);
+router.get('/list', controller.feriasList);
+router.get('/get/:id', controller.feriasGet);
+router.put('/delete/:id', controller.feriasDelete);
+router.post('/update/:id', controller.feriasUpdate);
 
 /*router.get('/list/:id_user', feriasController.ferias_lista_user);
 router.get('/list', feriasController.ferias_lista);

@@ -3,8 +3,6 @@ var sequelize = require('../models/database');
 
 const controllers = {};
 
-sequelize.sync();
-
 controllers.empresaGet = async (req, res) => {
     const data = await Empresa.findAll({where: {id_empresa: 1}})
     .then(function(data) {

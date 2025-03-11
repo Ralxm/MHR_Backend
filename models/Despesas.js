@@ -51,10 +51,4 @@ const Despesas = SequelizeDB.define('despesas', {
     freezeTableName: true
 });
 
-User.hasMany(Despesas, { foreignKey: 'id_user' });
-Despesas.belongsTo(User, { foreignKey: 'id_user' });
-Projetos.hasMany(Despesas, { foreignKey: 'id_projeto' });
-Despesas.belongsTo(Projetos, { foreignKey: 'id_projeto' });
-
-
 module.exports = Despesas;

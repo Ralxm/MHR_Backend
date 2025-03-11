@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const controller = require('../controllers/Linha_Temporal');
+const controller = require('../controllers/Linha_Temporal_Controller');
 
 router.post('/create', controller.linhaTemporalCreate);
 router.get('/list', controller.linhaTemporalList);

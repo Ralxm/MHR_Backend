@@ -3,52 +3,56 @@ const app = express();
 const sequelize = require('./models/database');
 const Sequelize = require('sequelize')
 const middleware = require('./middleware')
-
-//IMPORT DAS ROUTES
-const faltasRoute = require('./routes/faltasRoute');
-const ideiaRoute = require('./routes/ideiaRoute');
-const feriasRoute = require('./routes/feriasRoute');
-const userRoute = require('./routes/userRoute')
-const calendarioRoute = require('./routes/calendarioRoute');
-const despesasRoute = require('./routes/despesasRoute');
-const blogRoute = require('./routes/blogRoute');
-const noticiaRoute = require('./routes/noticiaRoute');
-const visitaRoute = require('./routes/visitaRoute');
-const candidaturasRoute = require('./routes/candidaturasRoute');
-const departamentoRoute = require('./routes/departamentoRoute');
-const empresaRoute = require('./routes/empresaRoute');
-const notificacoesRoute = require('./routes/notificacoesRoute');
-const projetosRoute = require('./routes/projetosRoute');
-const reembolsosRoute = require('./routes/reembolsosRoute');
-const vagaRoute = require('./routes/vagaRoute');
-const userVisitanteRoute = require('./routes/userVisitanteRoute');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 require('./cronJobs');
 
+//IMPORT DAS ROUTES
+const AuditLog = require('./routes/AuditLog_Route')
+const Blog = require('./routes/Blog_Route')
+const Calendario = require('./routes/Calendario_Route')
+const Candidaturas = require('./routes/Candidaturas_Route')
+const Comentarios_Projetos = require('./routes/Comentarios_Projetos_Route')
+const Comentarios = require('./routes/Comentarios_Route')
+const Departamento = require('./routes/Departamento_Route')
+const Despesas = require('./routes/Despesas_Route')
+const Empresa = require('./routes/Empresa_Route')
+const Faltas = require('./routes/Faltas_Route')
+const Ferias = require('./routes/Ferias_Route')
+const Ideia = require('./routes/Ideia_Route')
+const Linha_Temporal = require('./routes/Linha_Temporal_Route')
+const Notificacoes = require('./routes/Notificacoes_Route')
+const Perfil_Projeto = require('./routes/Perfil_Projeto_Route')
+const Perfis = require('./routes/Perfis_Route')
+const Projetos = require('./routes/Projetos_Route')
+const Tipo_Faltas = require('./routes/Tipo_Faltas_Route')
+const Tipo_Utilizadores = require('./routes/Tipo_Utilizadores_Route')
+const Utilizadores = require('./routes/Utilizadores_Route')
+const Vaga = require('./routes/Vaga_Route')
+
 //IMPORT DOS MODELOS
 const _AuditLog = require('./models/AuditLog')
-const _Blog = require('./models/AuditLog')
-const _Calendario = require('./models/AuditLog')
-const _Candidaturas = require('./models/AuditLog')
-const _Comentarios_Projetos = require('./models/AuditLog')
-const _Comentarios = require('./models/AuditLog')
-const _Departamento = require('./models/AuditLog')
-const _Despesas = require('./models/AuditLog')
-const _Empresas = require('./models/AuditLog')
-const _Faltas = require('./models/AuditLog')
-const _Ferias = require('./models/AuditLog')
-const _Ideia = require('./models/AuditLog')
-const _Linha_Temporal = require('./models/AuditLog')
-const _Notificacoes = require('./models/AuditLog')
-const _Perfil_Projeto = require('./models/AuditLog')
-const _Perfis = require('./models/AuditLog')
-const _Projetos = require('./models/AuditLog')
-const _Tipo_Faltas = require('./models/AuditLog')
-const _Tipo_Utilizador = require('./models/AuditLog')
-const _Utilizadores = require('./models/AuditLog')
-const _Vaga = require('./models/AuditLog');
+const _Blog = require('./models/Blog')
+const _Calendario = require('./models/Calendario')
+const _Candidaturas = require('./models/Candidaturas')
+const _Comentarios_Projetos = require('./models/Comentarios_Projetos')
+const _Comentarios = require('./models/Comentarios')
+const _Departamento = require('./models/Departamento')
+const _Despesas = require('./models/Despesas')
+const _Empresas = require('./models/Empresa')
+const _Faltas = require('./models/Faltas')
+const _Ferias = require('./models/Ferias')
+const _Ideia = require('./models/Ideia')
+const _Linha_Temporal = require('./models/Linha_Temporal')
+const _Notificacoes = require('./models/Notificacoes')
+const _Perfil_Projeto = require('./models/Perfil_Projeto')
+const _Perfis = require('./models/Perfis')
+const _Projetos = require('./models/Projetos')
+const _Tipo_Faltas = require('./models/Tipo_Faltas')
+const _Tipo_Utilizador = require('./models/Tipo_Utilizador')
+const _Utilizadores = require('./models/Utilizadores')
+const _Vaga = require('./models/Vaga');
 
 
 //DEFINIR OPÇÕES
@@ -102,20 +106,8 @@ async function syncDatabase() {
   }
 }
 
-async function initializeDatabase(){
-  //ESTA FUNÇÃO SERVE PARA CRIAR OS ELEMENTOS DEPARTAMENTO, PROJETO, IDEIA INICIAIS PARA QUE ESTES OBTENHAM ID = 1 E SIRVAM COMO BASE AO FUNCIONAMENTO DO PROJETO.
-  //SERVE TAMBÉM PARA INICIALIZAR A BASE DE DADOS COM UMA CONTA ADMINISTRADOR E CRIAR OS TIPOS DE FALTAS E UTILIZADORES
-
-  //ESTES ELEMENTOS ID = 1 SERVEM PARA PREENCHER O LUGAR DAS CHAVES ESTRANGEIRAS DE TABELAS QUE TENHAM VÁRIAS FK MAS QUE APENAS NECESSITEM DE UMA
-
-  //EX: TABELA LINHA_TEMPORAL QUE SERVE PARA GUARDAR OBJETIVOS OU BLOQUEIOS DE PROJETOS OU IDEIAS
-  //A LINHA_TEMPORAL APENAS PERTENCE A UM PROJETO OU A UMA IDEIA. ASSIM, SE O ID_PROJETO DA LINHA FOR 1, SIGNIFICA QUE A MESMA PERTENCE A UMA IDEIA.
-  //O MESMO SE APLICA SE O ID_IDEIA DA LINHA FOR 1 -> PERTENCE A UM PROJETO.
-
-  //PONTOS:
-  //LINHA TEMPORAL COM IDEIA OU PROJETO
-  //COMENTARIOS_PROJETOS COM IDEIA OU PROJETO
-  //DESPESAS COM DEPARTAMENTO OU PROJETO OU PERFIL
+async function initializeDatabase() {
+  //ESTA FUNÇÃO SERVE PARA INICIALIZAR A BASE DE DADOS COM UMA CONTA ADMINISTRADOR E CRIAR OS TIPOS DE FALTAS E UTILIZADORES
 
   //CRIA O TIPO DE FALTAS
   criarTipoFaltas();
@@ -134,7 +126,7 @@ async function initializeDatabase(){
   //CRIA O TIPO DE UTILIZADORES
   const tipoUtilizadoresCount = await _Tipo_Utilizador.count();
   let admin;
-  if(tipoUtilizadoresCount == 0){
+  if (tipoUtilizadoresCount == 0) {
     admin = await _Tipo_Utilizador.create({
       nome: 'Administrador'
     })
@@ -156,7 +148,7 @@ async function initializeDatabase(){
   const utilizadoresCount = await _Utilizadores.count();
   const perfilCount = await _Perfis.count();
   let perfil;
-  if(utilizadoresCount == 0 && perfilCount == 0){
+  if (utilizadoresCount == 0 && perfilCount == 0) {
     perfil = await _Perfis.create({
       id_departamento: departamento.id_departamento,
       nome: "Administrador",
@@ -177,45 +169,11 @@ async function initializeDatabase(){
       validade_token: ""
     })
   }
-
-  //CRIA UMA IDEIA INDEFINIDA COMO BASE
-  const ideiaCount = await _Ideia.count();
-  let ideia;
-  if(ideiaCount == 0){
-    ideia = await _Ideia.create({
-      id_perfil: perfil.id_perfil,
-      titulo_ideia: "Indefinido",
-      descricao: "Indefinido",
-      estado: "Indefinido",
-      ficheiro_complementar: "Indefinido",
-      validador: 0,
-      comentarios: "Indefinido",
-      created_at: new Date(),
-      updated_at: new Date() 
-    })
-  }
-
-  // CRIA UM PROJETO INDEFINIDO COMO BASE. TODOS OS PROJETOS TERÃO IDEIA = 1 SE FOREM CRIADOS SEM UMA IDEIA POR TRÁS
-  const projetoCount = await _Projetos.count();
-  if(projetoCount == 0){
-    await _Projetos.create({
-      id_ideia: ideia.id_ideia,
-      titulo_projeto: "Indefinido",
-      estado: "Indefinido",
-      data_atribuicao: new Date(),
-      descricao: "Indefinido",
-      objetivos: "Indefinido",
-      data_inicio: new Date(),
-      data_final_prevista: new Date(),
-      created_at: new Date(),
-      updated_at: new Date() 
-    })
-  }
 }
 
-async function criarTipoFaltas(){
+async function criarTipoFaltas() {
   const tipoFaltasCount = await _Tipo_Faltas.count();
-  if(tipoFaltasCount == 0){
+  if (tipoFaltasCount == 0) {
     await _Tipo_Faltas.create({
       tipo: 'F015',
       descricao: 'Baixa Médica'
@@ -315,25 +273,27 @@ async function criarTipoFaltas(){
   }
 }
 
-
-app.use('/faltas', faltasRoute);
-app.use('/ideias', ideiaRoute);
-app.use('/ferias', feriasRoute);
-app.use('/user', userRoute);
-app.use('/calendario', calendarioRoute);
-app.use('/despesas', despesasRoute);
-app.use('/blog', blogRoute);
-app.use('/noticia', noticiaRoute);
-app.use('/visita', visitaRoute);
-app.use('/candidaturas', candidaturasRoute);
-app.use('/departamento', departamentoRoute);
-app.use('/empresa', empresaRoute);
-app.use('/notificacoes', notificacoesRoute);
-app.use('/projeto', projetosRoute);
-app.use('/reembolsos', reembolsosRoute);
-app.use('/vaga', vagaRoute);
-app.use('/userVisitante', userVisitanteRoute);
-
+app.use('/auditlog', AuditLog)
+app.use('/blog', Blog)
+app.use('/calendario', Calendario)
+app.use('/candidaturas', Candidaturas)
+app.use('/comentarios_projetos', Comentarios_Projetos)
+app.use('/comentarios', Comentarios)
+app.use('/departamento', Departamento)
+app.use('/despesas', Despesas)
+app.use('/empresa', Empresa)
+app.use('/faltas', Faltas)
+app.use('/ferias', Ferias)
+app.use('/ideia', Ideia)
+app.use('/linha_temporal', Linha_Temporal)
+app.use('/notificacoes', Notificacoes)
+app.use('/perfil_projeto', Perfil_Projeto)
+app.use('/perfis', Perfis)
+app.use('/projetos', Projetos)
+app.use('/tipo_faltas', Tipo_Faltas)
+app.use('/tipo_utilizadores', Tipo_Utilizadores)
+app.use('/utilizadores', Utilizadores)
+app.use('/vaga', Vaga)
 
 sequelize.sync({ alter: true })
   .then(() => {
@@ -343,6 +303,7 @@ sequelize.sync({ alter: true })
     console.error('Erro ao sincronizar modelos com o banco de dados:', err);
   });
 
+syncDatabase();
 
 app.listen(app.get('port'), () => {
   console.log("Start server on port " + app.get('port'));

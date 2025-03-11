@@ -3,8 +3,6 @@ var sequelize = require('../models/database');
 
 const controller = {};
 
-sequelize.sync();
-
 controller.feriasCreate = async function (req, res){
     const { id_perfil, id_calendario, data_inicio, data_conclusao, data_pedido, duracao, estado, validador, comentarios } = req.body;
     const data = await Ferias.create({

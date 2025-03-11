@@ -19,6 +19,9 @@ const upload = multer({ storage: storage });
 
 router.post('/create', upload.single('anexo'), controller.comentarioProjetoCreate);
 router.get('/list', controller.comentarioProjetoList);
+router.get('/listProjeto/:id', controller.comentarioProjetoListPorProjeto);
+router.get('/listIdeia/:id', controller.comentarioProjetoListPorIdeia);
+router.get('/listUser/:id', controller.comentarioProjetoListPorUser);
 router.get('/get/:id', controller.comentarioProjetoGet);
 router.put('/delete:id', controller.comentarioProjetoDelete);
 router.post('/update:id',upload.single('anexo'), controller.comentarioProjetoUpdate);

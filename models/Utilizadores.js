@@ -17,13 +17,6 @@ const Utilizadores = SequelizeDB.define('utilizadores', {
             key: 'id_tipo'
         }
     },
-    id_perfil: {
-        type: Sequelize.INTEGER,
-        references: {
-            model: Perfis,
-            key: 'id_perfil'
-        }
-    },
     nome_utilizador: Sequelize.STRING(50),
     pass: Sequelize.STRING(256),
     estado: Sequelize.STRING(50),

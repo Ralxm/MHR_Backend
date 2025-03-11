@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 
-const ideiasController = require('../controllers/ideiasController');
+const controller = require('../controllers/Ideia_Controller');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -18,7 +18,7 @@ const upload = multer({ storage: storage });
 
 router.post('/create', upload.single('ficheiro_complementar'), controller.ideiaCreate);
 router.get('/list', controller.ideiaList);
-router.get('/listAnalise', controller.ideiaList_EmDesenvolvimento);
+router.get('/listAnalise', controller.ideiaList_EmAnalise);
 router.get('/listAprovada', controller.ideiaList_Aprovada);
 router.get('/listRejeitada', controller.ideiaList_Rejeitada);
 router.get('/get/:id', controller.ideiaGet);

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const controller = require('../controllers/Perfis_Projeto_Controller');
+const controller = require('../controllers/Perfil_Projeto_Controller');
 
 router.post('/create', controller.perfilProjetoCreate);
 router.get('/list', controller.perfilProjetoList);

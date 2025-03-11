@@ -54,6 +54,24 @@ controller.comentarioList = async function (req, res){
     });
 }
 
+controller.comentarioListCandidatura = async function (req, res){
+    const { id } = req.params;
+    const data = await Comentarios.findAll({order: ['created_at']}, {where: {id_candidatura: id}})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os comentários",
+            error: error.message
+        });
+    });
+}
+
 controller.comentarioGet = async function (req, res){
     const { id } = req.params;
     const data = await Comentarios.findAll({

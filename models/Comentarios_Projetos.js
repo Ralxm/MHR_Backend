@@ -1,5 +1,6 @@
 var Sequelize = require('sequelize');
 var SequelizeDB = require('./database');
+var Projetos = require('./Projetos')
 var Ideia = require('./Ideia');
 
 const Comentarios_Projetos = SequelizeDB.define('comentarios_projetos', {

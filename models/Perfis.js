@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const SequelizeDB = require('./database');
 const Departamento = require('./Departamento')
 const Utilizadores = require('./Utilizadores')
+const AuditLog = require('./AuditLog')
 
 const Perfis = SequelizeDB.define('perfis', {
     id_perfil: {

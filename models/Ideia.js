@@ -30,12 +30,6 @@ const Ideia = SequelizeDB.define('ideia', {
     freezeTableName: true
 });
 
-User.hasMany(Ideia, { foreignKey: 'id_user' });
-Ideia.belongsTo(User, { foreignKey: 'id_user' });
-
-Projetos.hasMany(Ideia, { foreignKey: 'id_projeto' });
-Ideia.belongsTo(Projetos, { foreignKey: 'id_projeto' });
-
 Ideia.afterCreate((ideia, options) => {
     return AuditLog.create({
         utilizador: ideia.id_perfil,

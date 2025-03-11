@@ -1,8 +1,6 @@
 const express = require('express');
-
 const router = express.Router();
-
-const faltasController = require('../controllers/Faltas_Controller');
+const controller = require('../controllers/Faltas_Controller');
 
 const multer = require('multer');
 const path = require('path');
@@ -22,7 +20,7 @@ router.post('/create', upload.single('anexo'), controller.faltasCreate);
 router.get('/list', controller.faltasList);
 router.get('/get/:id', controller.faltasGet);
 router.put('/delete:id', controller.faltasDelete);
-router.post('/update:id',upload.single('anexo'), controller.faltasUpdate);
+router.post('/update:id', upload.single('anexo'), controller.faltasUpdate);
 /*
 
 router.get('/uploads/files/:justificacao', faltasController.download_file);

@@ -4,8 +4,6 @@ var sequelize = require('../models/database');
 
 const controller = {};
 
-sequelize.sync();
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage }).single('imagem');
 
@@ -593,4 +591,4 @@ controllers.minhas_publicacoes = async (req, res) => {
     }
 }
     */
-module.exports = controllers;
+module.exports = controller;

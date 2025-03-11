@@ -1,4 +1,4 @@
-const cron = require('node-cron');
+/*const cron = require('node-cron');
 const { atualizarEstadoVagas } = require('./controllers/vagaController');
 
 cron.schedule('0 0 * * *', async () => {
@@ -7,4 +7,4 @@ cron.schedule('0 0 * * *', async () => {
     } catch (error) {
         console.error('Erro ao atualizar:', error);
     }
-});
+});*/

@@ -5,8 +5,6 @@ const config = require('../config');
 
 const controller = {};
 
-sequelize.sync();
-
 function getDate(){
     let now = new Date();
     let dd = now.getDate();
@@ -699,4 +697,4 @@ controllers.candidaturas_lista_user_visitante = async (req, res) => {
 */
 
 
-module.exports = controllers;
+module.exports = controller;
