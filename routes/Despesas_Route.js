@@ -22,7 +22,7 @@ router.get('/listAprovadasPor/:id', controller.despesasListAprovadasPorUser); //
 router.get('/listAprovadasPor/:id', controller.despesasListRejeitadasPorUser); //Lista todas as despesas que foram rejeitadas por um dado manager
 router.get('/listAprovadas', controller.despesasListAprovadas); //Lista todas as despesas que foram aprovadas
 router.get('/listRejeitadas', controller.despesasListRejeitadas); //Lista todas as despesas que foram rejeitadas
-router.get('/listPorAprovar', controller.despesasListPorAprovas); //Lista todas as despesas que estão por aprovar
+router.get('/listPorAprovar', controller.despesasListPorAprovar); //Lista todas as despesas que estão por aprovar
 router.get('/get/:id', controller.despesasGet);
 router.put('/delete:id', controller.despesasDelete);
 router.post('/update:id',upload.single('anexo'), controller.despesasUpdate);

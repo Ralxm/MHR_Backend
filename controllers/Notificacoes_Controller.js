@@ -32,7 +32,7 @@ controllers.notificacoesListManager = async (req, res) => {
     }
 }
 
-controllers.notificacoesListManager = async (req, res) => {
+controllers.notificacoesListUser = async (req, res) => {
     const { id } = req.params
     try {
         const publicacoesCount = await Blog.count({ where: { estado: 'Em avaliação', id_perfil: id} });

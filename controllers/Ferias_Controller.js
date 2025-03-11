@@ -120,6 +120,24 @@ controller.feriasListRejeitadas = async function (req, res){
     });
 }
 
+controller.feriasListUser = async function (req, res){
+    const { id } = req.params
+    const data = await Ferias.findAll({order: ['data_inicio']}, {where: {id_perfil: id}})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar as férias",
+            error: error.message
+        });
+    });
+}
+
 controller.feriasGet = async function (req, res){
     const { id } = req.params;
     const data = await Ferias.findAll({
