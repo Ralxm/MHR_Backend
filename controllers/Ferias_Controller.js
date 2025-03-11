@@ -37,7 +37,7 @@ controller.feriasCreate = async function (req, res){
 }
 
 controller.feriasList = async function (req, res){
-    const data = await Ferias.findAll({order: ['data_pedido']})
+    const data = await Ferias.findAll({order: ['data_inicio']})
     .then(function(data) {
         res.status(200).json({
             success: true,

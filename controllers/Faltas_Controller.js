@@ -18,7 +18,7 @@ function getDate(){
 }
 
 controller.faltasCreate = async function (req, res){
-    const { id_tipofalta, id_perfil, id_calendario, data_falta, tipo, estado, validador, comentarios} = req.body;
+    const { id_tipofalta, id_perfil, id_calendario, data_falta, motivo, tipo, validador, comentarios} = req.body;
     const justificacao = req.file ? req.file.path : null;
 
     const data = await Faltas.create({
@@ -26,9 +26,10 @@ controller.faltasCreate = async function (req, res){
         id_perfil: id_perfil,
         id_calendario: id_calendario,
         data_falta: data_falta,
+        motivo: motivo,
         justificacao: justificacao,
         tipo: tipo,
-        estado: estado,
+        estado: "Pendente",
         validador: validador,
         comentarios: comentarios,
         created_at: getDate(),
@@ -53,7 +54,7 @@ controller.faltasCreate = async function (req, res){
 controller.faltasList = async function (req, res){
     try {
         const data = await Faltas.findAll({
-            order: ['created_at']
+            order: ['data_falta']
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -128,7 +129,7 @@ controller.faltasDelete = async function (req, res){
 
 controller.faltasUpdate = async function (req, res) {
     const { id } = req.params;
-    const { data_falta, tipo, estado, validador, comentarios} = req.body;
+    const { data_falta, tipo, validador, comentarios} = req.body;
 
     try {
         //Encontra o comentário que vamos atualizar
@@ -156,7 +157,7 @@ controller.faltasUpdate = async function (req, res) {
             data_falta: data_falta,
             justificacao: justificacao,
             tipo: tipo,
-            estado: estado,
+            estado: "Pendente",
             validador: validador,
             comentarios: comentarios,
             updated_at: getDate()
