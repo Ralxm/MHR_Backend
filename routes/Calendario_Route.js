@@ -6,9 +6,10 @@ const controller = require('../controllers/Calendario_Controller');
 
 router.post('/create', controller.calendarioCreate);
 router.get('/list', controller.calendarioList);
+router.post('/listUser/:id', controller.calendarioListUser);
 router.get('/get/:id', controller.calendarioGet);
-router.put('/delete:id', controller.calendarioDelete);
-router.post('/update:id', controller.calendarioUpdate);
+router.put('/delete/:id', controller.calendarioDelete);
+router.post('/update/:id', controller.calendarioUpdate);
 
 /*router.get('/list/:id_user', calendarioController.eventos_lista_user);
 router.get('/list', calendarioController.eventos_lista);

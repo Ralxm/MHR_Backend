@@ -27,7 +27,7 @@ const Candidaturas = SequelizeDB.define('candidaturas', {
     curriculo: Sequelize.TEXT,
     telemovel: Sequelize.STRING(9),
     email: Sequelize.STRING(256),
-    status: Sequelize.CHAR(256),
+    status: Sequelize.CHAR(256), //Aceite, Em análise, Rejeitada
     responsavel: Sequelize.INTEGER,
     resultado: Sequelize.STRING(2000),
     created_at: Sequelize.DATE,

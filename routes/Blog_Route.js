@@ -6,9 +6,15 @@ const controller = require('../controllers/Blog_Controller');
 
 router.post('/create', controller.blogCreate);
 router.get('/list', controller.blogList);
+router.get('/listUser/:id', controller.blogListUser);
+router.get('/list/validadas', controller.blogListValidadas);
+router.get('/list/por_validar', controller.blogListPorValidar);
+router.get('/list/rejeitada', controller.blogListRejeitada);
 router.get('/get/:id', controller.blogGet);
-router.put('/delete:id', controller.blogDelete);
-router.post('/update:id', controller.blogUpdate);
+router.put('/delete/:id', controller.blogDelete);
+router.post('/update/:id', controller.blogUpdate);
+router.post('/validar/:id', controller.blogValidar);
+router.post('/rejeitar/:id', controller.blogRejeitar);
 
 /*router.get('/listAll', blogController.publicacoes_lista);
 router.get('/list/validadas', blogController.publicacoes_lista_validadas);

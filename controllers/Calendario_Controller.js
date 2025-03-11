@@ -1,11 +1,11 @@
 const Calendario = require('../models/Calendario');
 var sequelize = require('../models/database');
 
-const controllers = {};
+const controller = {};
 
 sequelize.sync();
 
-controllers.calendarioCreate = async (req, res) => {
+controller.calendarioCreate = async (req, res) => {
     const { id_perfil, _data, descricao, dias_ferias_ano_atual, dias_ferias_ano_anterior } = req.body;
     const data = await Calendario.create({
         id_perfil: id_perfil,
@@ -30,7 +30,7 @@ controllers.calendarioCreate = async (req, res) => {
     });
 }
 
-controllers.calendarioList = async (req, res) => {
+controller.calendarioList = async (req, res) => {
     const data = await Calendario.findAll()
     .then(function(data) {
         res.status(200).json({
@@ -47,7 +47,25 @@ controllers.calendarioList = async (req, res) => {
     });
 }
 
-controllers.calendarioGet = async (req, res) => {
+controller.calendarioListUser = async (req, res) => {
+    const { id } = req.params;
+    const data = await Calendario.findAll({where: {id_perfil: id}})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os calendarios",
+            error: error.message
+        });
+    });
+}
+
+controller.calendarioGet = async (req, res) => {
     const { id } = req.params;
     const data = await Calendario.findAll({where: { id_calendario: id }})
     .then(function(data) {
@@ -65,7 +83,7 @@ controllers.calendarioGet = async (req, res) => {
     });
 }
 
-controllers.calendarioDelete = async (req, res) => {
+controller.calendarioDelete = async (req, res) => {
     const { id } = req.params;
     const data = await Calendario.destroy({where: { id_calendario: id }})
     .then(function(data) {
@@ -83,7 +101,7 @@ controllers.calendarioDelete = async (req, res) => {
     });
 }
 
-controllers.calendarioUpdate = async (req, res) => {
+controller.calendarioUpdate = async (req, res) => {
     const { id } = req.params
     const { _data, descricao, dias_ferias_ano_atual, dias_ferias_ano_anterior } = req.body;
     const data = await Calendario.update({

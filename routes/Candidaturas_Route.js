@@ -19,10 +19,18 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/create', upload.single('anexo'), controller.candidaturasCreate);
-router.get('/list', controller.candidaturasProjetoList);
-router.get('/get/:id', controller.candidaturasProjetoGet);
-router.put('/delete:id', controller.candidaturasProjetoDelete);
-router.post('/update:id',upload.single('anexo'), controller.candidaturasProjetoUpdate);
+router.get('/list', controller.candidaturasList);
+router.get('/listVaga/:id', controller.candidaturasListPorVaga);
+router.get('/listVaga/:id', controller.candidaturasListPorUser);
+router.get('/listAceites', controller.candidaturasAceites);
+router.get('/listEmAnalise', controller.candidaturasAnalise);
+router.get('/listRejeitadas', controller.candidaturasRejeitadas);
+router.get('/get/:id', controller.candidaturasGet);
+router.put('/delete/:id', controller.candidaturasDelete);
+router.post('/update/:id', upload.single('anexo'), controller.candidaturasUpdate);
+router.post('/aceitar/:id', controller.candidaturasAceitar);
+router.post('/aceitar/:id', controller.candidaturasRejeitar);
+router.post('/updatePorUser/:id', upload.single('anexo'), controller.candidaturasUpdatePorUser);
 
 /*
 router.post('/upload', upload.single('cv'), candidaturasController.upload_file);

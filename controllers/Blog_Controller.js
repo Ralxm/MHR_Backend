@@ -90,6 +90,99 @@ controller.blogList = async function (req, res){
     });
 }
 
+controller.blogListUser = async function (req, res){
+    const { id } = req.params;
+    const data = await Blog.findAll({order: ['titulo_vaga']},{where: {id_perfil: id}})
+    .then(function(data) {
+        const posts = data.map(post => {
+            if(post.imagem){
+                post.imagem = post.imagaem.toString('base64')
+            }
+            return post;
+        })
+        res.status(200).json({
+            success: true,
+            data: posts
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar as publicações",
+            error: error.message
+        });
+    });
+}
+
+controller.blogListValidadas = async function (req, res){
+    const data = await Blog.findAll({order: ['titulo_vaga']},{where: {estado:"Validada"}})
+    .then(function(data) {
+        const posts = data.map(post => {
+            if(post.imagem){
+                post.imagem = post.imagaem.toString('base64')
+            }
+            return post;
+        })
+        res.status(200).json({
+            success: true,
+            data: posts
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar as publicações",
+            error: error.message
+        });
+    });
+}
+
+controller.blogListPorValidar = async function (req, res){
+    const data = await Blog.findAll({order: ['titulo_vaga']},{where: {estado:"Por Validar"}})
+    .then(function(data) {
+        const posts = data.map(post => {
+            if(post.imagem){
+                post.imagem = post.imagaem.toString('base64')
+            }
+            return post;
+        })
+        res.status(200).json({
+            success: true,
+            data: posts
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar as publicações",
+            error: error.message
+        });
+    });
+}
+
+controller.blogListRejeitada = async function (req, res){
+    const data = await Blog.findAll({order: ['titulo_vaga']},{where: {estado:"Rejeitada"}})
+    .then(function(data) {
+        const posts = data.map(post => {
+            if(post.imagem){
+                post.imagem = post.imagaem.toString('base64')
+            }
+            return post;
+        })
+        res.status(200).json({
+            success: true,
+            data: posts
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar as publicações",
+            error: error.message
+        });
+    });
+}
+
 
 controller.blogGet = async function (req, res){
     const { id } = req.params;
@@ -196,6 +289,50 @@ controller.blogUpdate = async function (req, res) {
             });
         }
     });
+};
+
+controller.blogValidar = async function (req, res) {
+    const { id } = req.params;
+    const data = await Blog.update({
+        estado: "Validada"
+    },{
+        where: {id_publicacao: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "Publicação aprovada com sucesso"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a aprovar a publicação",
+            error: error.message
+        });
+    })
+};
+
+controller.blogRejeitar = async function (req, res) {
+    const { id } = req.params;
+    const data = await Blog.update({
+        estado: "Rejeitada"
+    },{
+        where: {id_publicacao: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "Publicação rejeitada com sucesso"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a rejeitar a publicação",
+            error: error.message
+        });
+    })
 };
 
 

@@ -23,7 +23,7 @@ const Blog = SequelizeDB.define('blog', {
     data_visita: Sequelize.DATEONLY,
     duracao_visita: Sequelize.INTEGER,
     motivo_visita: Sequelize.TEXT(256),
-    estado: Sequelize.TEXT(50),
+    estado: Sequelize.TEXT(50), //Validada, Por Validar, Rejeitada
     validador: Sequelize.INTEGER,
     data_validacao: Sequelize.DATEONLY,
     created_at: Sequelize.DATE,
