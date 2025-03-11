@@ -1,12 +1,129 @@
 const Ferias = require('../models/Ferias');
-const User = require('../models/User');
 var sequelize = require('../models/database');
 
-const controllers = {};
+const controller = {};
 
 sequelize.sync();
 
-controllers.ferias_lista_user = async (req, res) => {
+controller.feriasCreate = async function (req, res){
+    const { id_perfil, id_calendario, data_inicio, data_conclusao, data_pedido, duracao, estado, validador, comentarios } = req.body;
+    const data = await Ferias.create({
+        id_perfil: id_perfil,
+        id_calendario: id_calendario,
+        data_inicio: data_inicio,
+        data_conclusao: data_conclusao,
+        data_pedido: data_pedido,
+        duracao: duracao,
+        estado: estado,
+        validador: 0,
+        comentarios: comentarios,
+        created_at: getDate(),
+        updated_at: getDate()
+    })
+    .then(function(data){
+        res.status(200).json({
+            success: true,
+            message: "Férias criadas",
+            data: data
+        })
+    })
+    .catch(error =>
+        res.status(500).json({
+            success: false,
+            message: "Erro a criar as férias",
+            error: error.message
+        })
+    )
+}
+
+controller.feriasList = async function (req, res){
+    const data = await Ferias.findAll({order: ['data_pedido']})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar as férias",
+            error: error.message
+        });
+    });
+}
+
+controller.feriasGet = async function (req, res){
+    const { id } = req.params;
+    const data = await Ferias.findAll({
+        where: { id_solicitacao: id }
+    })
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a encontrar as ferias",
+            error: error
+        });
+    })
+}
+
+controller.feriasDelete = async function (req, res){
+    const { id } = req.params;
+    const data = await Ferias.destroy({
+        where: {id_solicitacao: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "Férias apagado"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar as férias",
+            error: error.message
+        });
+    })
+}
+
+controller.feriasUpdate = async function (req, res){
+    const { id } = req.params;
+    const { data_inicio, data_conclusao, data_pedido, duracao, estado, validador, comentarios } = req.body;
+    const data = await Ferias.update({
+        data_inicio: data_inicio,
+        data_conclusao: data_conclusao,
+        data_pedido: data_pedido,
+        duracao: duracao,
+        estado: estado,
+        validador: validador,
+        comentarios: comentarios,
+        updated_at: getDate()
+    },{
+        where: {id_solicitacao: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "Férias apagadas"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar as férias",
+            error: error.message
+        });
+    })
+}
+
+/*controllers.ferias_lista_  = async (req, res) => {
     try {
         const { id_user } = req.params;
 
@@ -172,5 +289,6 @@ controllers.ferias_detalhes = async (req, res) => {
         });
     res.json({ success: true, data: data });
 }
+*/
 
-module.exports = controllers;
+module.exports = controller;

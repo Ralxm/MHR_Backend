@@ -2,10 +2,15 @@ const express = require('express');
 
 const router = express.Router();
 
+const controller = require('../controllers/Ferias_Controller');
 
-const feriasController = require('../controllers/feriasController');
+router.post('/create', controller.tipoFaltasCreate);
+router.get('/list', controller.tipoFaltasList);
+router.get('/get/:id', controller.tipoFaltasGet);
+router.put('/delete/:id', controller.tipoFaltasDelete);
+router.put('/update/:id', controller.tipoFaltasUpdate);
 
-router.get('/list/:id_user', feriasController.ferias_lista_user);
+/*router.get('/list/:id_user', feriasController.ferias_lista_user);
 router.get('/list', feriasController.ferias_lista);
 router.put('/aprovar/:id_solicitacao', feriasController.ferias_aprovar);
 router.put('/rejeitar/:id_solicitacao', feriasController.ferias_rejeitar);
@@ -14,5 +19,6 @@ router.post('/create', feriasController.ferias_adicionar);
 router.delete('/delete/:id_solicitacao', feriasController.ferias_apagar);
 router.post('/update', feriasController.ferias_atualizar);
 router.get('/listDetalhes/:id', feriasController.ferias_detalhes);
+*/
 
 module.exports = router;

@@ -2,22 +2,29 @@ const express = require('express');
 
 const router = express.Router();
 
-const faltasController = require('../controllers/faltasController');
+const faltasController = require('../controllers/Faltas_Controller');
 
 const multer = require('multer');
 const path = require('path');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, path.join('uploads/justificacoes/'));
+        cb(null, path.join('ficheiros/faltas/'));
     },
     filename: function(req, file, cb) {
         cb(null, file.originalname);
     }
 });
 
-
 const upload = multer({ storage: storage });
+
+router.post('/create', upload.single('anexo'), controller.faltasCreate);
+router.get('/list', controller.faltasList);
+router.get('/get/:id', controller.faltasGet);
+router.put('/delete:id', controller.faltasDelete);
+router.post('/update:id',upload.single('anexo'), controller.faltasUpdate);
+/*
+
 router.get('/uploads/files/:justificacao', faltasController.download_file);
 
 router.get('/list/:id_user', faltasController.falta_lista_user);
@@ -29,5 +36,6 @@ router.post('/update', faltasController.falta_atualizar);
 router.put('/delete', faltasController.falta_apagar);
 router.put('/aprovar/:id_falta', faltasController.faltas_aprovar);
 router.put('/rejeitar/:id_falta', faltasController.faltas_rejeitar);
+*/
 
 module.exports = router;

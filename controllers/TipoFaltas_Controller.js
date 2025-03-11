@@ -80,7 +80,7 @@ controller.tipoFaltasDelete = async function (req, res){
     })
 }
 
-controller.tipoFaltasDelete = async function (req, res){
+controller.tipoFaltasUpdate = async function (req, res){
     const { id } = req.params;
     const { tipo, descricao } = req.body;
     const data = await Tipo_Faltas.update({
