@@ -1,11 +1,11 @@
 const Departamento = require('../models/Departamento');
 var sequelize = require('../models/database');
 
-const controllers = {};
+const controller = {};
 
 sequelize.sync();
 
-controllers.departamentoCreate = async (req, res) => {
+controller.departamentoCreate = async (req, res) => {
     const { nome_departamento, descricao, responsavel_departamento } = req.body;
     const data = await Departamento.create({
         nome_departamento: nome_departamento,
@@ -28,7 +28,7 @@ controllers.departamentoCreate = async (req, res) => {
     });
 }
 
-controllers.departamentoList = async (req, res) => {
+controller.departamentoList = async (req, res) => {
     const data = await Departamento.findAll()
     .then(function(data) {
         res.status(200).json({
@@ -45,7 +45,7 @@ controllers.departamentoList = async (req, res) => {
     });
 }
 
-controllers.departamentoGet = async (req, res) => {
+controller.departamentoGet = async (req, res) => {
     const { id } = req.params;
     const data = await Departamento.findAll({where: { id_departamento: id }})
     .then(function(data) {
@@ -63,9 +63,9 @@ controllers.departamentoGet = async (req, res) => {
     });
 }
 
-controllers.departamentoDelete = async (req, res) => {
-    const { id_departamento } = req.params;
-    const data = await Departamento.destroy({where: { id_departamento: id_departamento }})
+controller.departamentoDelete = async (req, res) => {
+    const { id } = req.params;
+    const data = await Departamento.destroy({where: { id_departamento: id }})
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -81,15 +81,15 @@ controllers.departamentoDelete = async (req, res) => {
     });
 }
 
-controllers.departamentoUpdate = async (req, res) => {
-    const { id_departamento } = req.params
+controller.departamentoUpdate = async (req, res) => {
+    const { id } = req.params
     const { nome_departamento, descricao, responsavel_departamento } = req.body;
     const data = await Departamento.update({
         nome_departamento: nome_departamento,
         descricao : descricao,
         responsavel_departamento: responsavel_departamento
     }, {
-        where: { id_departamento: id_departamento }
+        where: { id_departamento: id }
     })
     .then(function(data) {
         res.status(200).json({
@@ -108,4 +108,4 @@ controllers.departamentoUpdate = async (req, res) => {
 
 
 
-module.exports = controllers;
+module.exports = controller;

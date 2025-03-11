@@ -1,14 +1,115 @@
-const Faltas = require('../models/Faltas');
-const Ferias = require('../models/Ferias');
-const User = require('../models/User');
 const Calendario = require('../models/Calendario');
-
 var sequelize = require('../models/database');
 
 const controllers = {};
 
 sequelize.sync();
 
+controllers.calendarioCreate = async (req, res) => {
+    const { id_perfil, _data, descricao, dias_ferias_ano_atual, dias_ferias_ano_anterior } = req.body;
+    const data = await Calendario.create({
+        id_perfil: id_perfil,
+        _data : _data,
+        descricao: descricao,
+        dias_ferias_ano_atual: dias_ferias_ano_atual,
+        dias_ferias_ano_anterior: dias_ferias_ano_anterior
+    })
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            message: "Calendario Criado",
+            data: data
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a criar o calendario",
+            error: error.message
+        })
+    });
+}
+
+controllers.calendarioList = async (req, res) => {
+    const data = await Calendario.findAll()
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os calendarios",
+            error: error.message
+        });
+    });
+}
+
+controllers.calendarioGet = async (req, res) => {
+    const { id } = req.params;
+    const data = await Calendario.findAll({where: { id_calendario: id }})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a encontrar o calendario",
+            error: error
+        });
+    });
+}
+
+controllers.calendarioDelete = async (req, res) => {
+    const { id } = req.params;
+    const data = await Calendario.destroy({where: { id_calendario: id }})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            message: "Calendario apagado"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar o calendario",
+            error: error
+        });
+    });
+}
+
+controllers.calendarioUpdate = async (req, res) => {
+    const { id } = req.params
+    const { _data, descricao, dias_ferias_ano_atual, dias_ferias_ano_anterior } = req.body;
+    const data = await Calendario.update({
+        _data : _data,
+        descricao: descricao,
+        dias_ferias_ano_atual: dias_ferias_ano_atual,
+        dias_ferias_ano_anterior: dias_ferias_ano_anterior
+    }, {
+        where: { id_calendario: id }
+    })
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            message: "Calendario atualizado"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a atualizar o calendario",
+            error: error
+        });
+    });
+}    
+
+/*
 controllers.eventos_lista_user = async (req, res) => {
     try {
         const { id_user } = req.params;
@@ -153,4 +254,6 @@ controllers.numero_dias_ferias_restantes = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 }
+    */
+
 module.exports = controllers;
