@@ -56,6 +56,42 @@ controller.utilizadoresList = async function (req, res){
     });
 }
 
+controller.utilizadoresListTipo = async function (req, res){
+    const { id } = req.params
+    const data = await Utilizadores.findAll({order: ['nome_utilizador']}, {where: {id_tipo: id}})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os registos",
+            error: error.message
+        });
+    });
+}
+
+controller.utilizadoresListEstado = async function (req, res){
+    const { est } = req.params
+    const data = await Utilizadores.findAll({order: ['nome_utilizador']}, {where: {estado: est}})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os registos",
+            error: error.message
+        });
+    });
+}
+
 controller.utilizadoresGet = async function (req, res){
     const { id } = req.params;
     const data = await Utilizadores.findAll({
@@ -103,6 +139,52 @@ controller.utilizadoresUpdate = async function (req, res){
         id_tipo: id_tipo,
         nome_utilizador: nome_utilizador,
         estado: estado,
+        updated_at: getDate()
+    },{
+        where: {id_utilizador: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "AuditLog Apagado"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar o AuditLog",
+            error: error.message
+        });
+    })
+}
+
+controller.utilizadoresAtivarConta = async function (req, res){
+    const { id } = req.params;
+    const data = await Utilizadores.update({
+        estado: "Ativa",
+        updated_at: getDate()
+    },{
+        where: {id_utilizador: id}
+    })
+    .then(function() {
+        res.status(200).json({
+            success: true,
+            message: "AuditLog Apagado"
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar o AuditLog",
+            error: error.message
+        });
+    })
+}
+
+controller.utilizadoresDesativarConta = async function (req, res){
+    const { id } = req.params;
+    const data = await Utilizadores.update({
+        estado: "Desativada",
         updated_at: getDate()
     },{
         where: {id_utilizador: id}

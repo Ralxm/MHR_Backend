@@ -17,7 +17,7 @@ const Projetos = SequelizeDB.define('projetos', {
         allowNull: true
     },
     titulo_projeto: Sequelize.CHAR(256),
-    estado: Sequelize.STRING(50),
+    estado: Sequelize.STRING(50), //Em desenvolvimento, Parado, Concluído
     data_atribuicao: Sequelize.DATE,
     descricao: Sequelize.TEXT,
     objetivos: Sequelize.TEXT,

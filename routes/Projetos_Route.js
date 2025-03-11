@@ -7,8 +7,9 @@ const controller = require('../controllers/Projetos_Controller');
 
 router.post('/create', controller.projetoCreate);
 router.get('/list', controller.projetoList);
-router.get('/listDesenvolvimento', controller.projetoList_EmDesenvolvimento);
-router.get('/listConcluidos', controller.projetoList_Concluidos);
+router.get('/listDesenvolvimento', controller.projetoList_EmDesenvolvimento); //Lista todos os projetos em desenvolvimento
+router.get('/listParado', controller.projetoList_Parado); //Lista todos os projetos em pausa
+router.get('/listConcluidos', controller.projetoList_Concluidos); //Lista todos os projetos concluídos
 router.get('/get/:id', controller.projetoGet);
 router.put('/delete:id', controller.projetoDelete);
 router.post('/update:id', controller.projetoUpdate);

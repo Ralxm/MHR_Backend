@@ -59,10 +59,106 @@ controller.perfisList = async function (req, res){
     });
 }
 
+controller.perfisListDepartamento = async function (req, res){
+    const { id } = req.params
+    const data = await Perfis.findAll({order: ['nome']}, {where: {id_departamento: id}})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os perfis",
+            error: error.message
+        });
+    });
+}
+
+controller.perfisListDistrito = async function (req, res){
+    const { distrito } = req.params
+    const data = await Perfis.findAll({order: ['nome']}, {where: {distrito: distrito}})
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os perfis",
+            error: error.message
+        });
+    });
+}
+
 controller.perfisGet = async function (req, res){
     const { id } = req.params;
     const data = await Perfis.findAll({
         where: { id_perfil: id }
+    })
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a encontrar o perfil",
+            error: error
+        });
+    })
+}
+
+controller.perfisGetUtilizador = async function (req, res){
+    const { id } = req.params;
+    const data = await Perfis.findAll({
+        where: { id_utilizador: id }
+    })
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a encontrar o perfil",
+            error: error
+        });
+    })
+}
+
+controller.perfisGetTelemovel = async function (req, res){
+    const { tlm } = req.params;
+    const data = await Perfis.findAll({
+        where: { telemovel: tlm }
+    })
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a encontrar o perfil",
+            error: error
+        });
+    })
+}
+
+controller.perfisGetEmail = async function (req, res){
+    const { email } = req.params;
+    const data = await Perfis.findAll({
+        where: { email: email }
     })
     .then(function(data) {
         res.status(200).json({

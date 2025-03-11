@@ -81,6 +81,27 @@ controller.projetoList_EmDesenvolvimento = async function (req, res){
     });
 }
 
+controller.projetoList_Parado = async function (req, res){
+    const data = await Projetos.findAll({order: ['titulo_projeto']},
+        {
+            where: {estado: "Parado"}
+        }
+    )
+    .then(function(data) {
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+    })
+    .catch(error => {
+        res.status(500).json({
+            success: false,
+            message: "Erro a listar os Projetos",
+            error: error.message
+        });
+    });
+}
+
 controller.projetoList_Concluidos = async function (req, res){
     const data = await Projetos.findAll({order: ['titulo_projeto']},
         {
