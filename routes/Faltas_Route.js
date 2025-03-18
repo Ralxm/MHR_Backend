@@ -28,6 +28,7 @@ router.get('/listAnalise/:id', controller.faltasListAnalise); //Lista todas as f
 router.get('/get/:id', controller.faltasGet);
 router.put('/delete:id', controller.faltasDelete);
 router.post('/update:id', upload.single('anexo'), controller.faltasUpdate);
+router.post('/justificar:id', upload.single('anexo'), controller.faltasJustificar);
 /*
 
 router.get('/uploads/files/:justificacao', faltasController.download_file);

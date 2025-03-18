@@ -358,13 +358,60 @@ controller.faltasUpdate = async function (req, res) {
             justificacao = req.file.path;
         }
 
-        await Comentarios_Projetos.update({
+        await Faltas.update({
             data_falta: data_falta,
             justificacao: justificacao,
             tipo: tipo,
             estado: "Pendente",
             validador: validador,
             comentarios: comentarios,
+            updated_at: getDate()
+        }, {
+            where: { id_falta: id }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Falta atualizada com sucesso"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao atualizar a falta",
+            error: error.message
+        });
+    }
+};
+
+controller.faltasJustificar = async function (req, res) {
+    const { id } = req.params;
+    const { motivo } = req.body;
+
+    try {
+        //Encontra o comentário que vamos atualizar
+        const falta = await Faltas.findOne({ where: { id_falta: id } });
+
+        //Se não encontrar o comentário responde com um erro
+        if (!falta) {
+            return res.status(404).json({
+                success: false,
+                message: "Falta não encontrado"
+            });
+        }
+
+        //Esta parte do código verifica se o comentario já tem um ficheiro. Se sim, apaga-o e troca-o por um novo.
+        //Se não for inserido nenhum ficheiro diferente/novo na atualização então o ficheiro anterior mantém-se
+        let justificacao = falta.justificacao;
+        if (req.file) {
+            if (justificacao) {
+                fs.unlinkSync(path.resolve(justificacao));
+            }
+            justificacao = req.file.path;
+        }
+
+        await Faltas.update({
+            motivo:motivo, 
             updated_at: getDate()
         }, {
             where: { id_falta: id }
