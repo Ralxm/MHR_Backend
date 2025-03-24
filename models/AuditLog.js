@@ -7,7 +7,10 @@ const AuditLog = SequelizeDB.define('auditlog', {
       primaryKey: true,
       autoIncrement: true,
     },
-    utilizador: Sequelize.INTEGER,
+    utilizador: {
+      type: Sequelize.INTEGER,
+      allowNull: true
+    },
     data_atividade: Sequelize.DATE,
     tipo_atividade: Sequelize.TEXT,
     descricao: Sequelize.TEXT,

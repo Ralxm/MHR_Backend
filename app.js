@@ -144,29 +144,44 @@ async function initializeDatabase() {
     })
   }
 
+  function getDate(){
+    let now = new Date();
+    let dd = now.getDate();
+    let mm = now.getMonth() + 1;
+    let yyyy = now.getFullYear();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    let today = `${yyyy}-${mm}-${dd}`;
+    return today;
+}
+
   //CRIA A CONTA ADMINISTRADOR INICIAL
   const utilizadoresCount = await _Utilizadores.count();
   const perfilCount = await _Perfis.count();
-  let perfil;
+  let utilizador;
   if (utilizadoresCount == 0 && perfilCount == 0) {
-    perfil = await _Perfis.create({
+    utilizador = await _Utilizadores.create({
+      id_tipo: admin.id_tipo,
+      nome_utilizador: "Administrador",
+      pass: "Administrador123!",
+      estado: "Ativa",
+      token_resgate: "",
+      validade_token: '01-01-1970',
+      created_at: getDate(),
+      updated_at: getDate()
+    })
+
+    await _Perfis.create({
       id_departamento: departamento.id_departamento,
+      id_utilizador: utilizador.id_utilizador,
       nome: "Administrador",
       email: "admin@email.com",
       morada: "Indefinida",
       telemovel: "912345678",
       data_nascimento: new Date(),
-      distrito: "Viseu"
-    })
-
-    await _Utilizadores.create({
-      id_tipo: admin.id_tipo,
-      id_perfil: perfil.id_perfil,
-      nome_utilizador: "Administrador",
-      pass: "Administrador123!",
-      estado: "Ativo",
-      token_resgate: "",
-      validade_token: ""
+      distrito: "Viseu",
+      created_at: getDate(),
+      updated_at: getDate()
     })
   }
 }
@@ -273,7 +288,7 @@ async function criarTipoFaltas() {
   }
 }
 
-app.use('/auditlog', middleware.checkToken, AuditLog)
+app.use('/auditlog', AuditLog)
 app.use('/blog', middleware.checkToken, Blog)
 app.use('/calendario', middleware.checkToken, Calendario)
 app.use('/candidaturas', middleware.checkToken, Candidaturas)

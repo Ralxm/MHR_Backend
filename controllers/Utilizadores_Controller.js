@@ -1,8 +1,9 @@
 var Utilizadores = require('../models/Utilizadores')
-var Perfis = require('../models/Perfis')
+var AuditLog = require('../models/AuditLog')
 const controller = {};
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const config = require('../config')
 
 function getDate(){
     let now = new Date();
@@ -16,12 +17,17 @@ function getDate(){
 }
 
 controller.utilizadoresLogin = async function (req, res){
+    console.log('cheguei aqui')
+    console.log(req.body.nome_utilizador)
+    console.log(req.body.password)
+    console.log('e aqui')
     if(req.body.nome_utilizador && req.body.password){
         var nome_user = req.body.nome_utilizador;
         var password = req.body.password;
     }
     var user = await Utilizadores.findOne({where: { nome_utilizador: nome_user }})
     .then(function(data){
+        console.log(data)
         return data;
     })
     .catch(error =>{
@@ -35,7 +41,7 @@ controller.utilizadoresLogin = async function (req, res){
         });
     }
     else {
-        if (req.body.email && req.body.password && user) {
+        if (req.body.nome_utilizador && req.body.password && user) {
             const isMatch = bcrypt.compareSync(password, user.pass);
             if (req.body.nome_utilizador === user.nome_utilizador && isMatch) {
                 let token = jwt.sign({
@@ -44,26 +50,30 @@ controller.utilizadoresLogin = async function (req, res){
                     config.jwtSecret
                 );
 
-                if(user.id_tipo != 5){ //User não é um visitante -> Tipo visitante = ID tipo 5
-                    let perfil = await Perfis.findOne({where: {id_utilizador: user.id_utilizador}})
+                if(user.estado == "Ativa"){
                     res.json({
                         success: true,
                         message: 'Autenticação realizada comsucesso!',
                         token: token,
                         id_utilizador: user.id_utilizador,
-                        tipo: id_tipo,
-                        id_perfil: perfil
+                        tipo: user.id_tipo,
+                        estado: user.estado,
+                        nome_utilizador: user.nome_utilizador
                     });
                 }
                 else{
-                    res.json({
-                        success: true,
-                        message: 'Autenticação realizada comsucesso!',
-                        token: token,
-                        id_utilizador: user.id_utilizador,
-                        tipo: id_tipo,
+                    res.status(400).json({
+                        success: false,
+                        message: 'Conta não está ativa.'
                     });
-                }             
+                }     
+
+                await AuditLog.create({
+                    utilizador: user.id_utilizador,
+                    data_atividade: getDate(),
+                    tipo_atividade: "Login",
+                    descricao: "Utilizador com nome " + user.nome_utilizador + " fez login."
+                })
             } 
             else {
                 res.status(403).json({
@@ -74,28 +84,26 @@ controller.utilizadoresLogin = async function (req, res){
             else {
             res.status(400).json({
                 success: false,
-                message: 'Erro no processo deautenticação. Tente de novo mais tarde.'
+                message: 'Erro no processo de autenticação. Tente de novo mais tarde.'
             });
         }
     }
 }
 
 controller.utilizadoresCreate = async function (req, res){
-    const { id_tipo, id_perfil, nome_utilizador, pass, estado } = req.body;
+    const { id_tipo, nome_utilizador, pass, estado, validade_token } = req.body;
 
     const user = await Utilizadores.findAll({where: {nome_utilizador: nome_utilizador}})
 
-    if(user){
+    if(user.length > 0){
         return res.status(500).json({
             success: false,
             message: "Já existe um utilizador com esse nome",
-            error: error.message
         })
     }
 
     const data = await Utilizadores.create({
         id_tipo: id_tipo,
-        id_perfil: id_perfil,
         nome_utilizador: nome_utilizador,
         pass: pass,
         estado: estado,
@@ -116,6 +124,16 @@ controller.utilizadoresCreate = async function (req, res){
             error: error.message
         })
     )
+
+    console.log(data)
+    if(data){
+        await AuditLog.create({
+            utilizador: user.id_utilizador,
+            data_atividade: getDate(),
+            tipo_atividade: "Registo",
+            descricao: "Utilizador com nome " + user.nome_utilizador + " fez registo."
+        })
+    }
 }
 
 controller.utilizadoresList = async function (req, res){
@@ -284,7 +302,7 @@ controller.utilizadoresDesativarConta = async function (req, res){
 }
 
 controller.ResgatePassword = async function (req, res) {
-    const { nome_utilizador } = req.body; // Assuming you pass the user ID in the request
+    const { nome_utilizador } = req.body;
 
     try {
         const token = Math.floor(100000 + Math.random() * 900000).toString(); //Número com 6 dígitos
@@ -324,13 +342,14 @@ controller.ResetPassword = async (req, res) => {
 
         const currentDate = new Date();
         if (user.token_resgate === token && currentDate < user.validade_token) {
+            console.log('Received newPassword:', newPassword);
             const hashedPassword = await bcrypt.hash(newPassword, 10);
 
             await Utilizadores.update(
                 {
                     pass: hashedPassword,
                     token_resgate: null,
-                    validade_token: null,
+                    validade_token: '01-01-1970',
                 },
                 {
                     where: { nome_utilizador: nome_utilizador },
@@ -338,6 +357,7 @@ controller.ResetPassword = async (req, res) => {
             );
 
             res.status(200).json({
+                 success: true,
                  message: 'Password alterada com sucesso'
                 });
         } else {
@@ -345,7 +365,7 @@ controller.ResetPassword = async (req, res) => {
                 message: 'Token não é válido'});
         }
     } catch (error) {
-        console.error('Error resetting password:', error);
+        console.error('Erro a alterar a password:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
