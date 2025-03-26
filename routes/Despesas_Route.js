@@ -1,5 +1,6 @@
 const express = require('express');
 const multer = require('multer');
+const path = require('path');
 const router = express.Router();
 
 const controller = require('../controllers/Despesas_Controller');
@@ -9,7 +10,8 @@ const storage = multer.diskStorage({
         cb(null, 'ficheiros/despesas/');
     },
     filename: function (req, file, cb) {
-        cb(null, path.extname(file.originalname));
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
@@ -24,8 +26,8 @@ router.get('/listAprovadas', controller.despesasListAprovadas); //Lista todas as
 router.get('/listRejeitadas', controller.despesasListRejeitadas); //Lista todas as despesas que foram rejeitadas
 router.get('/listPorAprovar', controller.despesasListPorAprovar); //Lista todas as despesas que estão por aprovar
 router.get('/get/:id', controller.despesasGet);
-router.put('/delete:id', controller.despesasDelete);
-router.post('/update:id',upload.single('anexo'), controller.despesasUpdate);
+router.put('/delete/:id', controller.despesasDelete);
+router.post('/update/:id',upload.single('anexo'), controller.despesasUpdate);
 
 /*router.get('/list/:id_user', despesasController.despesas_lista_user);
 router.post('/create', upload.none(),  despesasController.despesas_adicionar);
