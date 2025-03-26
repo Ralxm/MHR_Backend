@@ -349,7 +349,7 @@ controller.ResetPassword = async (req, res) => {
                 {
                     pass: hashedPassword,
                     token_resgate: null,
-                    validade_token: '01-01-1970',
+                    validade_token: null,
                 },
                 {
                     where: { nome_utilizador: nome_utilizador },

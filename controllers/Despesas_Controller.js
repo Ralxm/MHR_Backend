@@ -1,5 +1,6 @@
 const Despesas = require('../models/Despesas');;
 var sequelize = require('../models/database');
+const { Op } = require('sequelize');
 
 const controller = {};
 
@@ -197,9 +198,10 @@ controller.despesasListRejeitadas = async function (req, res){
 controller.despesasListPorAprovar = async function (req, res){
     try {
         const data = await Despesas.findAll({
-            order: ['data']
-        },{
-            where: {estado: "Por Aprovar"}
+            where: {
+                estado: { [Op.or]: ["Por Aprovar", "Pendente"] }
+            },
+            order: [['data', 'ASC']]
         });
 
         //Esta parte do código altera, na resposta, a variável anexo

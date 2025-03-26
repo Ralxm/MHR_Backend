@@ -64,7 +64,6 @@ app.set('port', process.env.PORT || 8080);
 app.use(cors(corsOptions));
 
 app.use('/ficheiros', express.static(path.join(__dirname, 'ficheiros')));
-//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -288,14 +287,14 @@ async function criarTipoFaltas() {
   }
 }
 
-app.use('/auditlog', AuditLog)
+app.use('/auditlog', middleware.checkToken, AuditLog)
 app.use('/blog', middleware.checkToken, Blog)
 app.use('/calendario', middleware.checkToken, Calendario)
 app.use('/candidaturas', middleware.checkToken, Candidaturas)
 app.use('/comentarios_projetos', middleware.checkToken, Comentarios_Projetos)
 app.use('/comentarios', middleware.checkToken, Comentarios)
 app.use('/departamento', middleware.checkToken, Departamento)
-app.use('/despesas', middleware.checkToken, Despesas)
+app.use('/despesas', Despesas)
 app.use('/empresa', middleware.checkToken, Empresa)
 app.use('/faltas', middleware.checkToken, Faltas)
 app.use('/ferias', middleware.checkToken, Ferias)
@@ -315,11 +314,11 @@ sequelize.sync({ alter: true })
     console.log('Modelos sincronizados com o banco de dados.');
   })
   .catch(err => {
-    console.error('Erro ao sincronizar modelos com o banco de dados:', err);
+    console.error('Erro ao sincronizar modelos com a base de dados:', err);
   });
 
 syncDatabase();
 
 app.listen(app.get('port'), () => {
-  console.log("Start server on port " + app.get('port'));
+  console.log("Servidor começou na porta " + app.get('port'));
 })

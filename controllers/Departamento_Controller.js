@@ -45,7 +45,9 @@ controller.departamentoList = async (req, res) => {
 
 controller.departamentoGet = async (req, res) => {
     const { id } = req.params;
-    const data = await Departamento.findAll({where: { id_departamento: id }})
+    const data = await Departamento.findOne({
+        where: { id_departamento: id }
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -63,7 +65,9 @@ controller.departamentoGet = async (req, res) => {
 
 controller.departamentoDelete = async (req, res) => {
     const { id } = req.params;
-    const data = await Departamento.destroy({where: { id_departamento: id }})
+    const data = await Departamento.destroy({
+        where: { id_departamento: id }
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
