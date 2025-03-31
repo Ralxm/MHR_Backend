@@ -1,4 +1,5 @@
-const Despesas = require('../models/Despesas');;
+const Despesas = require('../models/Despesas');
+const Perfis = require('../models/Perfis')
 var sequelize = require('../models/database');
 const { Op } = require('sequelize');
 
@@ -53,7 +54,19 @@ controller.despesasCreate = async function (req, res){
 controller.despesasList = async function (req, res){
     try {
         const data = await Despesas.findAll({
-            order: ['data']
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                }
+            ],
+            order: ['data', 'DESC']
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -81,9 +94,20 @@ controller.despesasListPorUser = async function (req, res){
     const { id } = req.params;
     try {
         const data = await Despesas.findAll({
+            where: { id_perfil: id },
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                }
+            ],
             order: ['data']
-        },{
-            where: {id_perfil: id}
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -99,6 +123,7 @@ controller.despesasListPorUser = async function (req, res){
         });
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({
             success: false,
             message: "Erro ao listar as despesas",
@@ -111,9 +136,20 @@ controller.despesasListAprovadasPorUser = async function (req, res){
     const { id } = req.params;
     try {
         const data = await Despesas.findAll({
+            where: {validador: id, estado: "Aprovada"},
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                }
+            ],
             order: ['data']
-        },{
-            where: {validador: id, estado: "Aprovada"}
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -140,9 +176,20 @@ controller.despesasListAprovadasPorUser = async function (req, res){
 controller.despesasListAprovadas = async function (req, res){
     try {
         const data = await Despesas.findAll({
+            where: {estado: "Aprovada"},
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                }
+            ],
             order: ['data']
-        },{
-            where: {estado: "Aprovada"}
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -169,9 +216,20 @@ controller.despesasListAprovadas = async function (req, res){
 controller.despesasListRejeitadas = async function (req, res){
     try {
         const data = await Despesas.findAll({
+            where: {estado: "Rejeitada"},
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                }
+            ],
             order: ['data']
-        },{
-            where: {estado: "Rejeitada"}
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -198,8 +256,20 @@ controller.despesasListRejeitadas = async function (req, res){
 controller.despesasListPorAprovar = async function (req, res){
     try {
         const data = await Despesas.findAll({
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                }
+            ],
             where: {
-                estado: { [Op.or]: ["Por Aprovar", "Pendente"] }
+                estado: { [Op.or]: ["Em análise", "Pendente"] }
             },
             order: [['data', 'ASC']]
         });
@@ -229,9 +299,20 @@ controller.despesasListRejeitadasPorUser = async function (req, res){
     const { id } = req.params;
     try {
         const data = await Despesas.findAll({
+            where: {validador: id, estado: "Rejeitada"},
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                }
+            ],
             order: ['data']
-        },{
-            where: {validador: id, estado: "Rejeitada"}
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -260,6 +341,18 @@ controller.despesasGet = async function (req, res){
 
     try {
         const data = await Despesas.findAll({
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                }
+            ],
             where: { id_despesa: id }
         });
 
@@ -308,12 +401,14 @@ controller.despesasUpdate = async function (req, res) {
     const { id } = req.params;
     const { id_departamento, id_projeto, id_perfil, _data, descricao, valor, validador, estado, reembolsado_por, comentarios} = req.body;
 
+    const toNullIfStringNull = (value) => (value === "null" || value === "undefined") ? null : value;
+    
     try {
         //Encontra o comentário que vamos atualizar
-        const comentarioProjeto = await Despesas.findOne({ where: { id_despesa: id } });
+        const despesa = await Despesas.findOne({ where: { id_despesa: id } });
 
         //Se não encontrar o comentário responde com um erro
-        if (!comentarioProjeto) {
+        if (!despesa) {
             return res.status(404).json({
                 success: false,
                 message: "Despesa não encontrada"
@@ -322,26 +417,24 @@ controller.despesasUpdate = async function (req, res) {
 
         //Esta parte do código verifica se o comentario já tem um ficheiro. Se sim, apaga-o e troca-o por um novo.
         //Se não for inserido nenhum ficheiro diferente/novo na atualização então o ficheiro anterior mantém-se
-        let anexo = comentarioProjeto.anexo;
+        let anexo = despesa.anexo;
         if (req.file) {
-            if (anexo) {
-                fs.unlinkSync(path.resolve(anexo));
-            }
+
             anexo = req.file.path;
         }
 
-        await Comentarios_Projetos.update({
-            id_departamento: id_departamento,
-            id_projeto: id_projeto,
-            id_perfil: id_perfil,
+        await Despesas.update({
+            id_departamento: toNullIfStringNull(id_departamento),
+            id_projeto: toNullIfStringNull(id_projeto),
+            id_perfil: toNullIfStringNull(id_perfil),
             data: _data,
             descricao: descricao,
             valor: valor,
             anexo: anexo,
-            validador: validador,
+            validador: toNullIfStringNull(validador),
             estado: estado,
-            reembolsado_por: reembolsado_por,
-            comentarios: comentarios,
+            reembolsado_por: toNullIfStringNull(reembolsado_por),
+            comentarios: toNullIfStringNull(comentarios),
             created_at: getDate(),
             updated_at: getDate()
         }, {
@@ -354,6 +447,7 @@ controller.despesasUpdate = async function (req, res) {
         });
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({
             success: false,
             message: "Erro ao atualizar a despesa",
