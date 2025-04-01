@@ -64,9 +64,108 @@ controller.despesasList = async function (req, res){
                     model: Perfis,
                     as: 'validadorPerfil',
                     required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'reembolsadorPerfil',
+                    required: false
                 }
             ],
             order: ['data', 'DESC']
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as despesas",
+            error: error.message
+        });
+    }
+}
+
+controller.despesasListGestao = async function (req, res){
+    try {
+        const data = await Despesas.findAll({
+            where: {
+                estado: { [Op.or]: ["Em análise", "Pendente", "Aprovada"] }
+            },
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'reembolsadorPerfil',
+                    required: false
+                }
+            ],
+            order: [['data', 'DESC']]
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar as despesas",
+            error: error.message
+        });
+    }
+}
+
+controller.despesasListHistorico = async function (req, res){
+    try {
+        const data = await Despesas.findAll({
+            where: {
+                estado: { [Op.or]: ["Rejeitada", "Reembolsada"] }
+            },
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'reembolsadorPerfil',
+                    required: false
+                }
+            ],
+            order: [['data', 'DESC']]
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -105,9 +204,14 @@ controller.despesasListPorUser = async function (req, res){
                     model: Perfis,
                     as: 'validadorPerfil',
                     required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'reembolsadorPerfil',
+                    required: false
                 }
             ],
-            order: ['data']
+            order: [['data', 'DESC']]
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -146,6 +250,11 @@ controller.despesasListAprovadasPorUser = async function (req, res){
                 {
                     model: Perfis,
                     as: 'validadorPerfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'reembolsadorPerfil',
                     required: false
                 }
             ],
@@ -187,6 +296,11 @@ controller.despesasListAprovadas = async function (req, res){
                     model: Perfis,
                     as: 'validadorPerfil',
                     required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'reembolsadorPerfil',
+                    required: false
                 }
             ],
             order: ['data']
@@ -227,6 +341,11 @@ controller.despesasListRejeitadas = async function (req, res){
                     model: Perfis,
                     as: 'validadorPerfil',
                     required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'reembolsadorPerfil',
+                    required: false
                 }
             ],
             order: ['data']
@@ -265,6 +384,11 @@ controller.despesasListPorAprovar = async function (req, res){
                 {
                     model: Perfis,
                     as: 'validadorPerfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'reembolsadorPerfil',
                     required: false
                 }
             ],
@@ -310,6 +434,11 @@ controller.despesasListRejeitadasPorUser = async function (req, res){
                     model: Perfis,
                     as: 'validadorPerfil',
                     required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'reembolsadorPerfil',
+                    required: false
                 }
             ],
             order: ['data']
@@ -350,6 +479,11 @@ controller.despesasGet = async function (req, res){
                 {
                     model: Perfis,
                     as: 'validadorPerfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'reembolsadorPerfil',
                     required: false
                 }
             ],

@@ -47,7 +47,14 @@ const Despesas = SequelizeDB.define('despesas', {
         allowNull: true
     },
     estado: Sequelize.STRING(50), //Aprovada, Em análise, Rejeitada
-    reembolsado_por: Sequelize.INTEGER,
+    reembolsado_por: {
+        type: Sequelize.INTEGER,
+        references: {
+            model: Perfis,
+            key: 'id_perfil'
+        },
+        allowNull: true
+    },
     comentarios: Sequelize.STRING(2000),
     created_at: Sequelize.DATE,
     updated_at: Sequelize.DATE,
@@ -66,6 +73,11 @@ Despesas.belongsTo(Perfis, {
 Despesas.belongsTo(Perfis, {
     foreignKey: 'validador',
     as: "validadorPerfil"
+});
+
+Despesas.belongsTo(Perfis, {
+    foreignKey: 'reembolsado_por',
+    as: "reembolsadorPerfil"
 });
 
 module.exports = Despesas;

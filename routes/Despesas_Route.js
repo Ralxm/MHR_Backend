@@ -19,6 +19,8 @@ const upload = multer({ storage: storage });
 
 router.post('/create', upload.single('anexo'), controller.despesasCreate);
 router.get('/list', controller.despesasList);
+router.get('/listGestao', controller.despesasListGestao); //Lista 
+router.get('/listHistorico', controller.despesasListHistorico); //Lista 
 router.get('/listUser/:id', controller.despesasListPorUser); //Lista todas as despesas registadas por utilizadores
 router.get('/listAprovadasPor/:id', controller.despesasListAprovadasPorUser); //Lista todas as despesas que foram aprovadas por um dado manager
 router.get('/listAprovadasPor/:id', controller.despesasListRejeitadasPorUser); //Lista todas as despesas que foram rejeitadas por um dado manager
