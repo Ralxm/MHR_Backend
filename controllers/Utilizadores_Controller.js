@@ -39,7 +39,7 @@ controller.utilizadoresLogin = async function (req, res) {
             const isMatch = bcrypt.compareSync(password, user.pass);
             if (req.body.nome_utilizador === user.nome_utilizador && isMatch) {
                 let token = jwt.sign({
-                    nome_utilizador: req.body.nome_utilizador
+                    id_utilizador: user.id_utilizador
                 },
                     config.jwtSecret
                 );

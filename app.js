@@ -59,6 +59,7 @@ const _Vaga = require('./models/Vaga');
 const corsOptions = {
   origin: 'http://localhost:3000',
   credentials: true,
+  exposedHeaders: ['Authorization']
 };
 app.set('port', process.env.PORT || 8080);
 app.use(cors(corsOptions));
