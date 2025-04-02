@@ -39,7 +39,4 @@ const Candidaturas = SequelizeDB.define('candidaturas', {
     freezeTableName: true
 });
 
-Vaga.hasMany(Candidaturas, { foreignKey: 'id_vaga', as: 'candidaturas' });
-Candidaturas.belongsTo(Vaga, { foreignKey: 'id_vaga', as: 'vaga' });
-
 module.exports = Candidaturas;

@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.post('/create', upload.single('anexo'), controller.candidaturasCreate);
+router.post('/create', upload.single('curriculo'), controller.candidaturasCreate);
 router.get('/list', controller.candidaturasList);
 router.get('/listVaga/:id', controller.candidaturasListPorVaga); //Lista todas as candidaturas pertencentes a uma dada vaga
 router.get('/listUser/:id', controller.candidaturasListPorUser); //Lista todas as candidaturas realizadas por um dado utilizador
@@ -27,10 +27,10 @@ router.get('/listEmAnalise', controller.candidaturasListAnalise); //Lista todas 
 router.get('/listRejeitadas', controller.candidaturasListRejeitadas); //Lista todas as candidaturas rejeitadas
 router.get('/get/:id', controller.candidaturasGet);
 router.put('/delete/:id', controller.candidaturasDelete);
-router.post('/update/:id', upload.single('anexo'), controller.candidaturasUpdate);
+router.post('/update/:id', upload.single('curriculo'), controller.candidaturasUpdate);
 router.post('/aceitar/:id', controller.candidaturasAceitar); //Aceita uma candidatura
 router.post('/rejeitar/:id', controller.candidaturasRejeitar); //Rejeita uma candidatura
-router.post('/updatePorUser/:id', upload.single('anexo'), controller.candidaturasUpdatePorUser); //Permite ao utilizador atualizar a sua candidatura a uma vaga
+router.post('/updatePorUser/:id', upload.single('curriculo'), controller.candidaturasUpdatePorUser); //Permite ao utilizador atualizar a sua candidatura a uma vaga
 
 /*
 router.post('/upload', upload.single('cv'), candidaturasController.upload_file);

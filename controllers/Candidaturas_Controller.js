@@ -17,19 +17,19 @@ function getDate(){
 }
 
 controller.candidaturasCreate = async function (req, res){
-    const { id_vaga, id_utilizador, data_submissao, telemovel, email, responsavel, resultado } = req.body;
+    const { id_vaga, id_utilizador, telemovel, email, status } = req.body;
     const curriculo = req.file ? req.file.path : null;
 
     const data = await Candidaturas.create({
         id_vaga: id_vaga,
         id_utilizador: id_utilizador,
-        data_submissao: data_submissao,
+        data_submissao: getDate(),
         curriculo: curriculo,
         telemovel: telemovel,
         email: email,
-        status: "Em análise",
-        responsavel: responsavel,
-        resultado: resultado,
+        status: status,
+        responsavel: 1,
+        resultado: "Em análise",
         created_at: getDate(),
         updated_at: getDate()
     })
