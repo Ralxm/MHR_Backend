@@ -18,7 +18,12 @@ function getDate(){
 
 controller.despesasCreate = async function (req, res){
     const { id_departamento, id_projeto, id_perfil, _data, descricao, valor, validador, estado, reembolsado_por, comentarios} = req.body;
-    const anexo = req.file ? req.file.path : null;
+
+    let anexos = null;
+    if (req.files && req.files.length > 0) {
+        anexos = JSON.stringify(req.files.map(file => file.path));
+    }
+
 
     const data = await Despesas.create({
         id_departamento: id_departamento,
@@ -27,7 +32,7 @@ controller.despesasCreate = async function (req, res){
         data: _data,
         descricao: descricao,
         valor: valor,
-        anexo: anexo,
+        anexo: anexos,
         validador: validador,
         estado: estado,
         reembolsado_por: reembolsado_por,
@@ -74,16 +79,9 @@ controller.despesasList = async function (req, res){
             order: ['data', 'DESC']
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
-        }));
-
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -121,16 +119,9 @@ controller.despesasListGestao = async function (req, res){
             order: [['data', 'DESC']]
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
-        }));
-
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -168,16 +159,9 @@ controller.despesasListHistorico = async function (req, res){
             order: [['data', 'DESC']]
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
-        }));
-
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -214,16 +198,9 @@ controller.despesasListPorUser = async function (req, res){
             order: [['data', 'DESC']]
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
-        }));
-
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -261,16 +238,9 @@ controller.despesasListAprovadasPorUser = async function (req, res){
             order: ['data']
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
-        }));
-
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -306,16 +276,9 @@ controller.despesasListAprovadas = async function (req, res){
             order: ['data']
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
-        }));
-
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -351,16 +314,9 @@ controller.despesasListRejeitadas = async function (req, res){
             order: ['data']
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
-        }));
-
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -398,16 +354,9 @@ controller.despesasListPorAprovar = async function (req, res){
             order: [['data', 'ASC']]
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
-        }));
-
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -444,16 +393,9 @@ controller.despesasListRejeitadasPorUser = async function (req, res){
             order: ['data']
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
-        }));
-
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -490,16 +432,10 @@ controller.despesasGet = async function (req, res){
             where: { id_despesa: id }
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
-        }));
 
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -533,15 +469,13 @@ controller.despesasDelete = async function (req, res){
 
 controller.despesasUpdate = async function (req, res) {
     const { id } = req.params;
-    const { id_departamento, id_projeto, id_perfil, _data, descricao, valor, validador, estado, reembolsado_por, comentarios} = req.body;
+    const { id_departamento, id_projeto, id_perfil, _data, descricao, valor, validador, estado, reembolsado_por, comentarios, existingAnexos} = req.body;
 
     const toNullIfStringNull = (value) => (value === "null" || value === "undefined") ? null : value;
     
     try {
-        //Encontra o comentário que vamos atualizar
         const despesa = await Despesas.findOne({ where: { id_despesa: id } });
 
-        //Se não encontrar o comentário responde com um erro
         if (!despesa) {
             return res.status(404).json({
                 success: false,
@@ -549,13 +483,11 @@ controller.despesasUpdate = async function (req, res) {
             });
         }
 
-        //Esta parte do código verifica se o comentario já tem um ficheiro. Se sim, apaga-o e troca-o por um novo.
-        //Se não for inserido nenhum ficheiro diferente/novo na atualização então o ficheiro anterior mantém-se
-        let anexo = despesa.anexo;
-        if (req.file) {
+        const keptFiles = existingAnexos ? JSON.parse(existingAnexos) : [];
+        const newFilePaths = req.files ? req.files.map(file => file.path) : [];
+        const allAnexos = [...keptFiles, ...newFilePaths];
+        const anexoFinal = allAnexos.length > 0 ? JSON.stringify(allAnexos) : null;
 
-            anexo = req.file.path;
-        }
 
         await Despesas.update({
             id_departamento: toNullIfStringNull(id_departamento),
@@ -564,7 +496,7 @@ controller.despesasUpdate = async function (req, res) {
             data: _data,
             descricao: descricao,
             valor: valor,
-            anexo: anexo,
+            anexo: anexoFinal,
             validador: toNullIfStringNull(validador),
             estado: estado,
             reembolsado_por: toNullIfStringNull(reembolsado_por),
