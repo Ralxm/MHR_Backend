@@ -14,13 +14,17 @@ function getDate(){
 }
 
 controller.vagaCreate = async function (req, res){
-    const { id_departamento, descricao, requisitos, titulo_vaga, created_by } = req.body;
+    const { id_departamento, descricao, requisitos, titulo_vaga, numero_vagas, estado, data_inicio, data_fecho, created_by } = req.body;
     const data = await Vaga.create({
         id_departamento: id_departamento,
         descricao: descricao,
         requisitos: requisitos,
         titulo_vaga: titulo_vaga,
         descricao: descricao,
+        numero_vagas: numero_vagas,
+        estado: estado,
+        data_inicio: data_inicio,
+        data_fecho: data_fecho,
         created_at: getDate(),
         updated_at: getDate(),
         created_by: created_by
@@ -121,12 +125,20 @@ controller.vagaDelete = async function (req, res){
 
 controller.vagaUpdate = async function (req, res){
     const { id } = req.params;
-    const { id_departamento, descricao, requisitos, titulo_vaga } = req.body;
+    const { id_departamento, descricao, requisitos, titulo_vaga, numero_vagas, estado, data_inicio, data_fecho } = req.body;
+    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    console.log(numero_vagas)
+    console.log(id_departamento)
+    console.log(descricao)
     const data = await Vaga.update({
         id_departamento: id_departamento,
         descricao: descricao,
         requisitos: requisitos,
         titulo_vaga: titulo_vaga,
+        numero_vagas: numero_vagas,
+        estado: estado,
+        data_inicio: data_inicio,
+        data_fecho: data_fecho,
         descricao: descricao,
         updated_at: getDate(),
     },{
