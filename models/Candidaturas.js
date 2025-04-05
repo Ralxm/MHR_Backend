@@ -39,4 +39,9 @@ const Candidaturas = SequelizeDB.define('candidaturas', {
     freezeTableName: true
 });
 
+Candidaturas.belongsTo(Utilizadores, {
+    foreignKey: 'id_utilizador',
+    as: "utilizador"
+});
+
 module.exports = Candidaturas;

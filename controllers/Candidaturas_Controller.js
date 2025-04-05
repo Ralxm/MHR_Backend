@@ -2,6 +2,7 @@ const Candidaturas = require('../models/Candidaturas');
 var sequelize = require('../models/database');
 const nodemailer = require('nodemailer');
 const config = require('../config');
+const Utilizadores = require('../models/Utilizadores')
 
 const controller = {};
 
@@ -52,7 +53,14 @@ controller.candidaturasCreate = async function (req, res){
 controller.candidaturasList = async function (req, res){
     try {
         const data = await Candidaturas.findAll({
-            order: ['data_submissao']
+            order: ['data_submissao'],
+            include: [
+                {
+                    model: Utilizadores,
+                    as: 'utilizador',
+                    required: false
+                }
+            ],
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -80,6 +88,13 @@ controller.candidaturasListPorVaga = async function (req, res){
     const { id } = req.params;
     try {
         const data = await Candidaturas.findAll({
+            include: [
+                {
+                    model: Utilizadores,
+                    as: 'utilizador',
+                    required: false
+                }
+            ],
             order: ['data_submissao']
         },
         {
@@ -110,6 +125,13 @@ controller.candidaturasListPorUser = async function (req, res){
     const { id } = req.params;
     try {
         const data = await Candidaturas.findAll({
+            include: [
+                {
+                    model: Utilizadores,
+                    as: 'utilizador',
+                    required: false
+                }
+            ],
             order: ['data_submissao']
         },
         {
@@ -140,6 +162,13 @@ controller.candidaturasListPorUser = async function (req, res){
 controller.candidaturasListAceites = async function (req, res){
     try {
         const data = await Candidaturas.findAll({
+            include: [
+                {
+                    model: Utilizadores,
+                    as: 'utilizador',
+                    required: false
+                }
+            ],
             order: ['data_submissao']
         },
         {
@@ -170,6 +199,13 @@ controller.candidaturasListAceites = async function (req, res){
 controller.candidaturasListAnalise = async function (req, res){
     try {
         const data = await Candidaturas.findAll({
+            include: [
+                {
+                    model: Utilizadores,
+                    as: 'utilizador',
+                    required: false
+                }
+            ],
             order: ['data_submissao']
         },
         {
@@ -200,6 +236,13 @@ controller.candidaturasListAnalise = async function (req, res){
 controller.candidaturasListRejeitadas = async function (req, res){
     try {
         const data = await Candidaturas.findAll({
+            include: [
+                {
+                    model: Utilizadores,
+                    as: 'utilizador',
+                    required: false
+                }
+            ],
             order: ['data_submissao']
         },
         {
@@ -232,6 +275,13 @@ controller.candidaturasGet = async function (req, res){
 
     try {
         const data = await Candidaturas.findAll({
+            include: [
+                {
+                    model: Utilizadores,
+                    as: 'utilizador',
+                    required: false
+                }
+            ],
             where: { id_candidatura: id }
         });
 
