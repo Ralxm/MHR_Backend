@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const SequelizeDB = require('./database');
 const Candidaturas = require('./Candidaturas')
+const Perfis = require('./Perfis');
 
 const Comentarios = SequelizeDB.define('comentarios', {
     id_comentario: {
@@ -24,6 +25,11 @@ const Comentarios = SequelizeDB.define('comentarios', {
     tableName: 'COMENTARIOS',
     timestamps: false,
     freezeTableName: true
+});
+
+Comentarios.belongsTo(Perfis, {
+    foreignKey: 'responsavel',
+    as: "perfil"
 });
 
 module.exports = Comentarios;
