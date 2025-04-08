@@ -15,7 +15,8 @@ const Perfis = SequelizeDB.define('perfis', {
         references:{
             model: Departamento,
             key: 'id_departamento'
-        }
+        },
+        allowNull: true
     },
     id_utilizador: {
         type: Sequelize.INTEGER,

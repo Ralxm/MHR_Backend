@@ -17,9 +17,13 @@ const Vaga = SequelizeDB.define('vaga', {
     },
     descricao: Sequelize.TEXT,
     requisitos: Sequelize.TEXT,
+    oferecemos: Sequelize.TEXT,
     titulo_vaga: Sequelize.STRING(256),
     numero_vagas: Sequelize.INTEGER,
+    numero_vagas_restantes: Sequelize.INTEGER,
     estado: Sequelize.STRING, //Aberta, Fechada, Ocupada
+    tipo: Sequelize.STRING,
+    local: Sequelize.STRING,
     data_inicio: Sequelize.DATE,
     data_fecho: Sequelize.DATE,
     created_at: Sequelize.DATE,

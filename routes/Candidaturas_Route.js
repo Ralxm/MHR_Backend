@@ -12,7 +12,8 @@ const storage = multer.diskStorage({
         cb(null, path.join('ficheiros/candidaturas/'));
     },
     filename: function(req, file, cb) {
-        cb(null, file.originalname);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
@@ -30,6 +31,7 @@ router.put('/delete/:id', controller.candidaturasDelete);
 router.post('/update/:id', upload.single('curriculo'), controller.candidaturasUpdate);
 router.post('/aceitar/:id', controller.candidaturasAceitar); //Aceita uma candidatura
 router.post('/rejeitar/:id', controller.candidaturasRejeitar); //Rejeita uma candidatura
+router.post('/analisar/:id', controller.candidaturasAnalisar); //Aceita uma candidatura
 router.post('/updatePorUser/:id', upload.single('curriculo'), controller.candidaturasUpdatePorUser); //Permite ao utilizador atualizar a sua candidatura a uma vaga
 
 /*

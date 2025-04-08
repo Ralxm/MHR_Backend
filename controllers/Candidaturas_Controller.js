@@ -3,10 +3,12 @@ var sequelize = require('../models/database');
 const nodemailer = require('nodemailer');
 const config = require('../config');
 const Utilizadores = require('../models/Utilizadores')
+const Vaga = require('../models/Vaga')
+const Perfis = require('../models/Perfis')
 
 const controller = {};
 
-function getDate(){
+function getDate() {
     let now = new Date();
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
@@ -17,8 +19,9 @@ function getDate(){
     return today;
 }
 
-controller.candidaturasCreate = async function (req, res){
+controller.candidaturasCreate = async function (req, res) {
     const { id_vaga, id_utilizador, telemovel, email, status } = req.body;
+
     const curriculo = req.file ? req.file.path : null;
 
     const data = await Candidaturas.create({
@@ -34,23 +37,23 @@ controller.candidaturasCreate = async function (req, res){
         created_at: getDate(),
         updated_at: getDate()
     })
-    .then(function(data){
-        res.status(200).json({
-            success: true,
-            message: "Candidatura criada",
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                message: "Candidatura criada",
+                data: data
+            })
         })
-    })
-    .catch(error =>
-        res.status(500).json({
-            success: false,
-            message: "Erro a criar a candidatura",
-            error: error.message
-        })
-    )
+        .catch(error =>
+            res.status(500).json({
+                success: false,
+                message: "Erro a criar a candidatura",
+                error: error.message
+            })
+        )
 }
 
-controller.candidaturasList = async function (req, res){
+controller.candidaturasList = async function (req, res) {
     try {
         const data = await Candidaturas.findAll({
             order: ['data_submissao'],
@@ -63,16 +66,9 @@ controller.candidaturasList = async function (req, res){
             ],
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            curriculo: item.curriculo ? `${req.protocol}://${req.get('host')}/${item.curriculo}` : null
-        }));
-
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -84,7 +80,7 @@ controller.candidaturasList = async function (req, res){
     }
 }
 
-controller.candidaturasListPorVaga = async function (req, res){
+controller.candidaturasListPorVaga = async function (req, res) {
     const { id } = req.params;
     try {
         const data = await Candidaturas.findAll({
@@ -95,22 +91,13 @@ controller.candidaturasListPorVaga = async function (req, res){
                     required: false
                 }
             ],
-            order: ['data_submissao']
-        },
-        {
-            where: {id_vaga: id}
+            order: ['data_submissao'],
+            where: { id_vaga: id }
         });
-
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            curriculo: item.curriculo ? `${req.protocol}://${req.get('host')}/${item.curriculo}` : null
-        }));
 
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -121,7 +108,7 @@ controller.candidaturasListPorVaga = async function (req, res){
         });
     }
 }
-controller.candidaturasListPorUser = async function (req, res){
+controller.candidaturasListPorUser = async function (req, res) {
     const { id } = req.params;
     try {
         const data = await Candidaturas.findAll({
@@ -132,22 +119,13 @@ controller.candidaturasListPorUser = async function (req, res){
                     required: false
                 }
             ],
-            order: ['data_submissao']
-        },
-        {
-            where: {id_utilizador: id}
+            order: ['data_submissao'],
+            where: { id_utilizador: id }
         });
-
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            curriculo: item.curriculo ? `${req.protocol}://${req.get('host')}/${item.curriculo}` : null
-        }));
 
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -159,7 +137,7 @@ controller.candidaturasListPorUser = async function (req, res){
     }
 }
 
-controller.candidaturasListAceites = async function (req, res){
+controller.candidaturasListAceites = async function (req, res) {
     try {
         const data = await Candidaturas.findAll({
             include: [
@@ -171,20 +149,13 @@ controller.candidaturasListAceites = async function (req, res){
             ],
             order: ['data_submissao']
         },
-        {
-            where: {status: "Aceite"}
-        });
-
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            curriculo: item.curriculo ? `${req.protocol}://${req.get('host')}/${item.curriculo}` : null
-        }));
+            {
+                where: { status: "Aceite" }
+            });
 
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -196,7 +167,7 @@ controller.candidaturasListAceites = async function (req, res){
     }
 }
 
-controller.candidaturasListAnalise = async function (req, res){
+controller.candidaturasListAnalise = async function (req, res) {
     try {
         const data = await Candidaturas.findAll({
             include: [
@@ -208,20 +179,13 @@ controller.candidaturasListAnalise = async function (req, res){
             ],
             order: ['data_submissao']
         },
-        {
-            where: {status: "Em análise"}
-        });
-
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            curriculo: item.curriculo ? `${req.protocol}://${req.get('host')}/${item.curriculo}` : null
-        }));
+            {
+                where: { status: "Em análise" }
+            });
 
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -233,7 +197,7 @@ controller.candidaturasListAnalise = async function (req, res){
     }
 }
 
-controller.candidaturasListRejeitadas = async function (req, res){
+controller.candidaturasListRejeitadas = async function (req, res) {
     try {
         const data = await Candidaturas.findAll({
             include: [
@@ -245,20 +209,13 @@ controller.candidaturasListRejeitadas = async function (req, res){
             ],
             order: ['data_submissao']
         },
-        {
-            where: {status: "Rejeitadas"}
-        });
-
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            curriculo: item.curriculo ? `${req.protocol}://${req.get('host')}/${item.curriculo}` : null
-        }));
+            {
+                where: { status: "Rejeitadas" }
+            });
 
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -270,7 +227,7 @@ controller.candidaturasListRejeitadas = async function (req, res){
     }
 }
 
-controller.candidaturasGet = async function (req, res){
+controller.candidaturasGet = async function (req, res) {
     const { id } = req.params;
 
     try {
@@ -285,16 +242,9 @@ controller.candidaturasGet = async function (req, res){
             where: { id_candidatura: id }
         });
 
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            curriculo: item.curriculo ? `${req.protocol}://${req.get('host')}/${item.curriculo}` : null
-        }));
-
         res.status(200).json({
             success: true,
-            data: modifiedData
+            data: data
         });
 
     } catch (error) {
@@ -306,34 +256,33 @@ controller.candidaturasGet = async function (req, res){
     }
 }
 
-controller.candidaturasDelete = async function (req, res){
+controller.candidaturasDelete = async function (req, res) {
     const { id } = req.params;
     const data = await Candidaturas.destroy({
-        where: {id_candidatura: id}
+        where: { id_candidatura: id }
     })
-    .then(function() {
-        res.status(200).json({
-            success: true,
-            message: "Candidatura apagada"
+        .then(function () {
+            res.status(200).json({
+                success: true,
+                message: "Candidatura apagada"
+            })
         })
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a apagar a candidatura",
-            error: error.message
-        });
-    })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a apagar a candidatura",
+                error: error.message
+            });
+        })
 }
 
 controller.candidaturasUpdate = async function (req, res) {
     const { id } = req.params;
-    const { comentario } = req.body;
     const { telemovel, email, status, responsavel, resultado } = req.body;
     try {
         //Encontra o comentário que vamos atualizar
         const candidatura = await Candidaturas.findOne({ where: { id_candidatura: id } });
-        
+
         //Se não encontrar o comentário responde com um erro
         if (!candidatura) {
             return res.status(404).json({
@@ -379,29 +328,110 @@ controller.candidaturasUpdate = async function (req, res) {
 };
 
 controller.candidaturasAceitar = async function (req, res) {
-    const { id } = req.params;
-    const { responsavel, resultado } = req.body;
-    const data = await Candidaturas.update({
-        status: "Aceite",
-        responsavel: responsavel,
-        resultado: resultado
-    },{
-        where: {id_candidatura: id}
-    })
-    .then(function() {
+    try {
+        const { id } = req.params;
+        const { responsavel, resultado } = req.body;
+
+        const candidatura = await Candidaturas.findOne({
+            where: { id_candidatura: id }
+        });
+
+        if (!candidatura) {
+            return res.status(404).json({
+                success: false,
+                message: "Candidatura não encontrada"
+            });
+        }
+
+        await Candidaturas.update({
+            status: "Aceite",
+            responsavel: responsavel,
+            resultado: resultado
+        }, {
+            where: { id_candidatura: id }
+        });
+
+        const vaga = await Vaga.findOne({
+            where: { id_vaga: candidatura.id_vaga }
+        });
+
+        if (vaga) {
+            if (vaga.numero_vagas_restantes === 1) {
+                vaga.numero_vagas_restantes = 0;
+                vaga.estado = "Ocupada";
+                console.log("Alterei a vaga para ocupada");
+            } else if (vaga.numero_vagas_restantes > 1) {
+                vaga.numero_vagas_restantes -= 1;
+                console.log("Diminui um valor do numero de vagas restantes");
+            }
+
+            vaga.changed('numero_vagas_restantes', true);
+            vaga.changed('estado', true);
+
+            await vaga.save();
+            console.log("Está tudo feito");
+        }
+
+        /*const perfil = await Perfis.findOne({where: {id_utilizador: candidatura.id_utilizador}})
+        const utilizador = await Utilizadores.findOne({where: {id_utilizador: candidatura.id_utilizador}})
+
+        if(!perfil){
+            await Perfis.create({
+                id_departamento: 1,
+                id_utilizador: candidatura.id_utilizador,
+                nome: "",
+                email: candidatura.email,
+                morada: "",
+                telemovel: candidatura.telemovel,
+                data_nascimento: "01-01-1970",
+                distrito: "",
+                created_at: getDate(),
+                updated_at: getDate()
+            })
+
+            if(utilizador){
+                utilizador.id_tipo = 3;
+                await utilizador.save();
+            }
+        }*/
+
+
         res.status(200).json({
             success: true,
             message: "Candidatura aceite com sucesso"
-        })
-    })
-    .catch(error => {
+        });
+    } catch (error) {
+        console.error("Erro ao aceitar candidatura:", error);
         res.status(500).json({
             success: false,
-            message: "Erro a aceitar a candidatura",
+            message: "Erro ao aceitar a candidatura",
             error: error.message
         });
+    }
+};
+
+controller.candidaturasAnalisar = async function (req, res) {
+    const { id } = req.params;
+    const data = await Candidaturas.update({
+        status: "Em análise",
+    }, {
+        where: { id_candidatura: id }
     })
+        .then(function () {
+            res.status(200).json({
+                success: true,
+                message: "Candidatura alterada para em análise com sucesso"
+            })
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a editar a candidatura para 'em análise'",
+                error: error.message
+            });
+        })
 }
+
 
 controller.candidaturasRejeitar = async function (req, res) {
     const { id } = req.params;
@@ -410,22 +440,22 @@ controller.candidaturasRejeitar = async function (req, res) {
         status: "Rejeitada",
         responsavel: responsavel,
         resultado: resultado
-    },{
-        where: {id_candidatura: id}
+    }, {
+        where: { id_candidatura: id }
     })
-    .then(function() {
-        res.status(200).json({
-            success: true,
-            message: "Candidatura rejeitada com sucesso"
+        .then(function () {
+            res.status(200).json({
+                success: true,
+                message: "Candidatura rejeitada com sucesso"
+            })
         })
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a rejeitar a candidatura",
-            error: error.message
-        });
-    })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a rejeitar a candidatura",
+                error: error.message
+            });
+        })
 }
 
 controller.candidaturasUpdatePorUser = async function (req, res) {
@@ -434,7 +464,7 @@ controller.candidaturasUpdatePorUser = async function (req, res) {
     try {
         //Encontra o comentário que vamos atualizar
         const candidatura = await Candidaturas.findOne({ where: { id_candidatura: id } });
-        
+
         //Se não encontrar o comentário responde com um erro
         if (!candidatura) {
             return res.status(404).json({
