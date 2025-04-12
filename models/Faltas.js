@@ -3,6 +3,7 @@ const SequelizeDB = require('./database');
 const Calendario = require('./Calendario');
 const Perfis = require('./Perfis');
 const Tipo_Faltas = require('./Tipo_Faltas');
+//const AuditLog = require('./AuditlLog')
 
 const Faltas = SequelizeDB.define('faltas', {
     id_falta: {
@@ -51,14 +52,19 @@ const Faltas = SequelizeDB.define('faltas', {
 Calendario.hasMany(Faltas, { foreignKey: 'id_calendario' });
 Faltas.belongsTo(Calendario, { foreignKey: 'id_calendario' });
 
-Faltas.afterCreate((faltas, options) => {
+Faltas.belongsTo(Perfis, {
+    foreignKey: 'id_perfil',
+    as: "perfil"
+});
+
+/*Faltas.afterCreate((faltas, options) => {
     return AuditLog.create({
         utilizador: faltas.id_perfil,
         data_atividade: getDate(),
         tipo_atividade: "Criação Férias",
         descricao: "Utilizador com ID Perfil " + faltas.id_perfil + " fez registo de falta com ID " + faltas.id_solicitacao + ".",
     })
-})
+})*/
 
 function getDate(){
     let now = new Date();

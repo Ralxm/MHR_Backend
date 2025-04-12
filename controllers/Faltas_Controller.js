@@ -1,6 +1,6 @@
 const Faltas = require('../models/Faltas');
 var sequelize = require('../models/database');
-
+const Perfis = require('../models/Perfis');
 
 const controller = {};
 
@@ -17,15 +17,14 @@ function getDate(){
 
 controller.faltasCreate = async function (req, res){
     const { id_tipofalta, id_perfil, id_calendario, data_falta, comentarios} = req.body;
-    const justificacao = req.file ? req.file.path : null;
 
     const data = await Faltas.create({
         id_tipofalta: id_tipofalta,
         id_perfil: id_perfil,
         id_calendario: id_calendario,
         data_falta: data_falta,
-        motivo: '',
-        justificacao: justificacao,
+        motivo: null,
+        justificacao: null,
         estado: "Pendente",
         comentarios: comentarios,
         created_at: getDate(),
@@ -34,22 +33,31 @@ controller.faltasCreate = async function (req, res){
     .then(function(data){
         res.status(200).json({
             success: true,
-            message: "Projeto criado",
+            message: "Falta criada com sucesso",
             data: data
         })
     })
-    .catch(error =>
+    .catch(error =>{
+        console.log(error)
         res.status(500).json({
             success: false,
-            message: "Erro a criar o Projeto",
+            message: "Erro a criar a falta",
             error: error.message
         })
+    }
     )
 }
 
 controller.faltasList = async function (req, res){
     try {
         const data = await Faltas.findAll({
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
             order: ['data_falta']
         });
 
@@ -78,6 +86,13 @@ controller.faltasListUser = async function (req, res){
     const { id } = req.params
     try {
         const data = await Faltas.findAll({
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
             order: ['data_falta']
         },{
             where: {id_perfil: id}
@@ -108,6 +123,13 @@ controller.faltasListTipo = async function (req, res){
     const { id } = req.params
     try {
         const data = await Faltas.findAll({
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
             order: ['data_falta']
         },{
             where: {id_tipofalta: id}
@@ -138,6 +160,13 @@ controller.faltasListAprovadasManager = async function (req, res){
     const { id } = req.params
     try {
         const data = await Faltas.findAll({
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
             order: ['data_falta']
         },{
             where: {validador: id, estado: "Aprovada"}
@@ -168,6 +197,13 @@ controller.faltasListRejeitadasManager = async function (req, res){
     const { id } = req.params
     try {
         const data = await Faltas.findAll({
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
             order: ['data_falta']
         },{
             where: {validador: id, estado: "Rejeitada"}
@@ -197,6 +233,13 @@ controller.faltasListRejeitadasManager = async function (req, res){
 controller.faltasListAprovadas = async function (req, res){
     try {
         const data = await Faltas.findAll({
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
             order: ['data_falta']
         },{
             where: {estado: "Aprovadas"}
@@ -226,6 +269,13 @@ controller.faltasListAprovadas = async function (req, res){
 controller.faltasListRejeitadas = async function (req, res){
     try {
         const data = await Faltas.findAll({
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
             order: ['data_falta']
         },{
             where: {estado: "Rejeitadas"}
@@ -255,6 +305,13 @@ controller.faltasListRejeitadas = async function (req, res){
 controller.faltasListAnalise = async function (req, res){
     try {
         const data = await Faltas.findAll({
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
             order: ['data_falta']
         },{
             where: {estado: "Em análise"}
@@ -286,6 +343,13 @@ controller.faltasGet = async function (req, res){
 
     try {
         const data = await Faltas.findAll({
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
             where: { id_falta: id }
         });
 
