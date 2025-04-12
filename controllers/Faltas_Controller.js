@@ -16,7 +16,7 @@ function getDate(){
 }
 
 controller.faltasCreate = async function (req, res){
-    const { id_tipofalta, id_perfil, id_calendario, data_falta, motivo, tipo, validador, comentarios} = req.body;
+    const { id_tipofalta, id_perfil, id_calendario, data_falta, comentarios} = req.body;
     const justificacao = req.file ? req.file.path : null;
 
     const data = await Faltas.create({
@@ -24,11 +24,9 @@ controller.faltasCreate = async function (req, res){
         id_perfil: id_perfil,
         id_calendario: id_calendario,
         data_falta: data_falta,
-        motivo: motivo,
+        motivo: '',
         justificacao: justificacao,
-        tipo: tipo,
         estado: "Pendente",
-        validador: validador,
         comentarios: comentarios,
         created_at: getDate(),
         updated_at: getDate()
