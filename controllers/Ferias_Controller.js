@@ -3,18 +3,27 @@ var sequelize = require('../models/database');
 
 const controller = {};
 
+function getDate(){
+    let now = new Date();
+    let dd = now.getDate();
+    let mm = now.getMonth() + 1;
+    let yyyy = now.getFullYear();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    let today = `${yyyy}-${mm}-${dd}`;
+    return today;
+}
+
 controller.feriasCreate = async function (req, res){
-    const { id_perfil, id_calendario, data_inicio, data_conclusao, data_pedido, duracao, estado, validador, comentarios } = req.body;
+    const { id_perfil, id_calendario, data_inicio, data_conclusao, duracao } = req.body;
     const data = await Ferias.create({
         id_perfil: id_perfil,
         id_calendario: id_calendario,
         data_inicio: data_inicio,
         data_conclusao: data_conclusao,
-        data_pedido: data_pedido,
+        data_pedido: getDate(),
         duracao: duracao,
-        estado: estado,
-        validador: 0,
-        comentarios: comentarios,
+        estado: "Pendente",
         created_at: getDate(),
         updated_at: getDate()
     })

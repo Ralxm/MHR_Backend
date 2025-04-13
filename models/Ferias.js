@@ -28,8 +28,14 @@ const Ferias = SequelizeDB.define('ferias', {
     data_pedido: Sequelize.DATE,
     duracao: Sequelize.INTEGER,
     estado: Sequelize.STRING(50), //Aprovada, Em análise, Rejeitada 
-    validador: Sequelize.INTEGER,
-    comentarios: Sequelize.STRING(2000),
+    validador: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+    },
+    comentarios:{
+        type: Sequelize.STRING(2000),
+        allowNull: true
+    },
     created_at: Sequelize.DATE,
     updated_at: Sequelize.DATE,
 },
