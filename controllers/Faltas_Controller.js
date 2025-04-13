@@ -93,8 +93,7 @@ controller.faltasListUser = async function (req, res){
                     required: false
                 },
             ],
-            order: ['data_falta']
-        },{
+            order: ['data_falta'],
             where: {id_perfil: id}
         });
 
@@ -130,8 +129,7 @@ controller.faltasListTipo = async function (req, res){
                     required: false
                 },
             ],
-            order: ['data_falta']
-        },{
+            order: ['data_falta'],
             where: {id_tipofalta: id}
         });
 
@@ -167,8 +165,7 @@ controller.faltasListAprovadasManager = async function (req, res){
                     required: false
                 },
             ],
-            order: ['data_falta']
-        },{
+            order: ['data_falta'],
             where: {validador: id, estado: "Aprovada"}
         });
 
@@ -204,8 +201,7 @@ controller.faltasListRejeitadasManager = async function (req, res){
                     required: false
                 },
             ],
-            order: ['data_falta']
-        },{
+            order: ['data_falta'],
             where: {validador: id, estado: "Rejeitada"}
         });
 
@@ -240,8 +236,7 @@ controller.faltasListAprovadas = async function (req, res){
                     required: false
                 },
             ],
-            order: ['data_falta']
-        },{
+            order: ['data_falta'],
             where: {estado: "Aprovadas"}
         });
 
@@ -276,8 +271,7 @@ controller.faltasListRejeitadas = async function (req, res){
                     required: false
                 },
             ],
-            order: ['data_falta']
-        },{
+            order: ['data_falta'],
             where: {estado: "Rejeitadas"}
         });
 
@@ -312,8 +306,7 @@ controller.faltasListAnalise = async function (req, res){
                     required: false
                 },
             ],
-            order: ['data_falta']
-        },{
+            order: ['data_falta'],
             where: {estado: "Em análise"}
         });
 
@@ -396,11 +389,11 @@ controller.faltasDelete = async function (req, res){
 
 controller.faltasUpdate = async function (req, res) {
     const { id } = req.params;
-    const { data_falta, tipo, validador, comentarios} = req.body;
-
+    const { id_calendario, id_perfil, id_tipofalta, comentarios, motivo, validador, data_falta, estado} = req.body;
+ 
     try {
         //Encontra o comentário que vamos atualizar
-        const falta = await Faltas.findOne({ where: { id_falta: id } });
+        const falta = await Faltas.findAll({ where: { id_falta: id } });
 
         //Se não encontrar o comentário responde com um erro
         if (!falta) {
@@ -423,10 +416,10 @@ controller.faltasUpdate = async function (req, res) {
         await Faltas.update({
             data_falta: data_falta,
             justificacao: justificacao,
-            tipo: tipo,
-            estado: "Pendente",
-            validador: validador,
+            estado: estado,
+            validador: validador === 'null' ? null : validador,
             comentarios: comentarios,
+            motivo: motivo,
             updated_at: getDate()
         }, {
             where: { id_falta: id }
@@ -438,6 +431,7 @@ controller.faltasUpdate = async function (req, res) {
         });
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({
             success: false,
             message: "Erro ao atualizar a falta",

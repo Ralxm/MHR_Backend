@@ -35,7 +35,7 @@ const Faltas = SequelizeDB.define('faltas', {
     data_falta: Sequelize.DATE,
     justificacao: Sequelize.TEXT,
     motivo: Sequelize.TEXT,
-    estado: Sequelize.STRING(50), //Aprovada, Em análise, Rejeitada
+    estado: Sequelize.STRING(50), //Aprovada, Em análise, Rejeitada, Pendente
     validador: {
         type: Sequelize.INTEGER,
         allowNull: true
