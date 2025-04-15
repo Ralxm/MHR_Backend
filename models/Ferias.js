@@ -48,13 +48,18 @@ const Ferias = SequelizeDB.define('ferias', {
 Calendario.hasMany(Ferias, { foreignKey: 'id_calendario' });
 Ferias.belongsTo(Calendario, { foreignKey: 'id_calendario' });
 
+Ferias.belongsTo(Perfis, {
+    foreignKey: 'id_perfil',
+    as: "perfil"
+});
+
 Ferias.afterCreate((ferias, options) => {
-    return AuditLog.create({
+    /*return AuditLog.create({
         utilizador: ferias.id_perfil,
         data_atividade: getDate(),
         tipo_atividade: "Criação Férias",
         descricao: "Utilizador com ID Perfil " + ferias.id_perfil + " fez registo de férias com ID " + ferias.id_solicitacao + ".",
-    })
+    })*/
 })
 
 function getDate(){

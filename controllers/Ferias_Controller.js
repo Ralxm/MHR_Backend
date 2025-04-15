@@ -1,5 +1,6 @@
 const Ferias = require('../models/Ferias');
 var sequelize = require('../models/database');
+const Perfis = require('../models/Perfis');
 
 const controller = {};
 
@@ -30,21 +31,32 @@ controller.feriasCreate = async function (req, res){
     .then(function(data){
         res.status(200).json({
             success: true,
-            message: "Férias criadas",
+            message: "Férias criadas com sucesso",
             data: data
         })
     })
-    .catch(error =>
+    .catch(error =>{
+        console.log(error)
         res.status(500).json({
             success: false,
             message: "Erro a criar as férias",
             error: error.message
         })
+    }
     )
 }
 
 controller.feriasList = async function (req, res){
-    const data = await Ferias.findAll({order: ['data_inicio']})
+    const data = await Ferias.findAll({
+        order: ['data_inicio'],
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+        ],
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -61,7 +73,17 @@ controller.feriasList = async function (req, res){
 }
 
 controller.feriasListEmAnalise = async function (req, res){
-    const data = await Ferias.findAll({order: ['data_inicio']}, {where: {estado: "Em análise"}})
+    const data = await Ferias.findAll({
+        order: ['data_inicio'],
+        where: {estado: "Em análise"},
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+        ],
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -78,7 +100,17 @@ controller.feriasListEmAnalise = async function (req, res){
 }
 
 controller.feriasListAprovadas = async function (req, res){
-    const data = await Ferias.findAll({order: ['data_inicio']}, {where: {estado: "Aprovada"}})
+    const data = await Ferias.findAll({
+        order: ['data_inicio'],
+        where: {estado: "Aprovada"},
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+        ],
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -96,7 +128,17 @@ controller.feriasListAprovadas = async function (req, res){
 
 controller.feriasListAprovadas = async function (req, res){
     const { id } = req.params
-    const data = await Ferias.findAll({order: ['data_inicio']}, {where: {id_perfil: id}})
+    const data = await Ferias.findAll({
+        order: ['data_inicio'], 
+        where: {id_perfil: id},
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+        ],
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -113,7 +155,17 @@ controller.feriasListAprovadas = async function (req, res){
 }
 
 controller.feriasListRejeitadas = async function (req, res){
-    const data = await Ferias.findAll({order: ['data_inicio']}, {where: {estado: "Rejeitada"}})
+    const data = await Ferias.findAll({
+        order: ['data_inicio'],
+        where: {estado: "Rejeitada"},
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+        ],
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -131,7 +183,17 @@ controller.feriasListRejeitadas = async function (req, res){
 
 controller.feriasListUser = async function (req, res){
     const { id } = req.params
-    const data = await Ferias.findAll({order: ['data_inicio']}, {where: {id_perfil: id}})
+    const data = await Ferias.findAll({
+        order: ['data_inicio'],
+        where: {id_perfil: id},
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+        ],
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -150,7 +212,14 @@ controller.feriasListUser = async function (req, res){
 controller.feriasGet = async function (req, res){
     const { id } = req.params;
     const data = await Ferias.findAll({
-        where: { id_solicitacao: id }
+        where: { id_solicitacao: id },
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+        ],
     })
     .then(function(data) {
         res.status(200).json({
@@ -189,11 +258,10 @@ controller.feriasDelete = async function (req, res){
 
 controller.feriasUpdate = async function (req, res){
     const { id } = req.params;
-    const { data_inicio, data_conclusao, data_pedido, duracao, estado, validador, comentarios } = req.body;
+    const { data_inicio, data_conclusao, duracao, estado, validador, comentarios } = req.body;
     const data = await Ferias.update({
         data_inicio: data_inicio,
         data_conclusao: data_conclusao,
-        data_pedido: data_pedido,
         duracao: duracao,
         estado: estado,
         validador: validador,
