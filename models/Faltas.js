@@ -57,6 +57,12 @@ Faltas.belongsTo(Perfis, {
     as: "perfil"
 });
 
+Faltas.belongsTo(Perfis, {
+    foreignKey: 'validador',
+    as: "validadorPerfil"
+});
+
+
 /*Faltas.afterCreate((faltas, options) => {
     return AuditLog.create({
         utilizador: faltas.id_perfil,

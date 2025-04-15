@@ -16,7 +16,7 @@ function getDate(){
 }
 
 controller.faltasCreate = async function (req, res){
-    const { id_tipofalta, id_perfil, id_calendario, data_falta, comentarios} = req.body;
+    const { id_tipofalta, id_perfil, id_calendario, data_falta, comentarios, estado} = req.body;
 
     const data = await Faltas.create({
         id_tipofalta: id_tipofalta,
@@ -25,7 +25,7 @@ controller.faltasCreate = async function (req, res){
         data_falta: data_falta,
         motivo: null,
         justificacao: null,
-        estado: "Pendente",
+        estado: estado,
         comentarios: comentarios,
         created_at: getDate(),
         updated_at: getDate()
@@ -55,6 +55,11 @@ controller.faltasList = async function (req, res){
                 {
                     model: Perfis,
                     as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
                     required: false
                 },
             ],
@@ -90,6 +95,11 @@ controller.faltasListUser = async function (req, res){
                 {
                     model: Perfis,
                     as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
                     required: false
                 },
             ],
@@ -128,6 +138,11 @@ controller.faltasListTipo = async function (req, res){
                     as: 'perfil',
                     required: false
                 },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                },
             ],
             order: ['data_falta'],
             where: {id_tipofalta: id}
@@ -162,6 +177,11 @@ controller.faltasListAprovadasManager = async function (req, res){
                 {
                     model: Perfis,
                     as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
                     required: false
                 },
             ],
@@ -200,6 +220,11 @@ controller.faltasListRejeitadasManager = async function (req, res){
                     as: 'perfil',
                     required: false
                 },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                },
             ],
             order: ['data_falta'],
             where: {validador: id, estado: "Rejeitada"}
@@ -233,6 +258,11 @@ controller.faltasListAprovadas = async function (req, res){
                 {
                     model: Perfis,
                     as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
                     required: false
                 },
             ],
@@ -270,6 +300,11 @@ controller.faltasListRejeitadas = async function (req, res){
                     as: 'perfil',
                     required: false
                 },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                },
             ],
             order: ['data_falta'],
             where: {estado: "Rejeitadas"}
@@ -303,6 +338,11 @@ controller.faltasListAnalise = async function (req, res){
                 {
                     model: Perfis,
                     as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
                     required: false
                 },
             ],
@@ -340,6 +380,11 @@ controller.faltasGet = async function (req, res){
                 {
                     model: Perfis,
                     as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
                     required: false
                 },
             ],
