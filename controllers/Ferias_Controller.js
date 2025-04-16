@@ -259,12 +259,18 @@ controller.feriasDelete = async function (req, res){
 controller.feriasUpdate = async function (req, res){
     const { id } = req.params;
     const { data_inicio, data_conclusao, duracao, estado, validador, comentarios } = req.body;
+    console.log(data_inicio)
+    console.log(data_conclusao)
+    console.log(duracao)
+    console.log(estado)
+    console.log(validador)
+    console.log(comentarios)
     const data = await Ferias.update({
         data_inicio: data_inicio,
         data_conclusao: data_conclusao,
         duracao: duracao,
         estado: estado,
-        validador: validador,
+        validador: validador == "null" ? null : validador,
         comentarios: comentarios,
         updated_at: getDate()
     },{
@@ -273,7 +279,7 @@ controller.feriasUpdate = async function (req, res){
     .then(function() {
         res.status(200).json({
             success: true,
-            message: "Férias apagadas"
+            message: "Férias alteradas com sucesso"
         })
     })
     .catch(error => {
