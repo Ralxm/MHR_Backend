@@ -2,6 +2,7 @@ var Sequelize = require('sequelize');
 var SequelizeDB = require('./database');
 var Projetos = require('./Projetos')
 var Ideia = require('./Ideia');
+var Perfis = require('./Perfis');
 
 const Comentarios_Projetos = SequelizeDB.define('comentarios_projetos', {
     id_comentario_projeto: {
@@ -35,6 +36,11 @@ const Comentarios_Projetos = SequelizeDB.define('comentarios_projetos', {
     tableName: 'COMENTARIOS_PROJETOS',
     timestamps: false,
     freezeTableName: true
+});
+
+Comentarios_Projetos.belongsTo(Perfis, {
+    foreignKey: 'autor',
+    as: "perfil"
 });
 
 module.exports = Comentarios_Projetos;

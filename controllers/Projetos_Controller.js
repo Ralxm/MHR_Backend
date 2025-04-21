@@ -2,7 +2,7 @@ const Projetos = require('../models/Projetos');
 var sequelize = require('../models/database');
 const controller = {};
 
-function getDate(){
+function getDate() {
     let now = new Date();
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
@@ -13,13 +13,13 @@ function getDate(){
     return today;
 }
 
-controller.projetoCreate = async function (req, res){
-    const { id_ideia, titulo_projeto, estado, data_atribuicao, descricao, objetivos, data_inicio, data_final_prevista } = req.body;
+controller.projetoCreate = async function (req, res) {
+    const { id_ideia, titulo_projeto, estado, descricao, objetivos, data_inicio, data_final_prevista } = req.body;
     const data = await Projetos.create({
         id_ideia: id_ideia,
         titulo_projeto: titulo_projeto,
         estado: estado,
-        data_atribuicao: data_atribuicao,
+        data_atribuicao: getDate(),
         descricao: descricao,
         objetivos: objetivos,
         data_inicio: data_inicio,
@@ -27,143 +27,145 @@ controller.projetoCreate = async function (req, res){
         created_at: getDate(),
         updated_at: getDate()
     })
-    .then(function(data){
-        res.status(200).json({
-            success: true,
-            message: "Projeto criado",
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                message: "Projeto criado",
+                data: data
+            })
         })
-    })
-    .catch(error =>
-        res.status(500).json({
-            success: false,
-            message: "Erro a criar o Projeto",
-            error: error.message
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({
+                success: false,
+                message: "Erro a criar o Projeto",
+                error: error.message
+            })
+        }
+    )
+}
+
+controller.projetoList = async function (req, res) {
+    const data = await Projetos.findAll({ order: ['titulo_projeto'] })
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
         })
-    )
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar os Projetos",
+                error: error.message
+            });
+        });
 }
 
-controller.projetoList = async function (req, res){
-    const data = await Projetos.findAll({order: ['titulo_projeto']})
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
-        });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar os Projetos",
-            error: error.message
-        });
-    });
-}
-
-controller.projetoList_EmDesenvolvimento = async function (req, res){
-    const data = await Projetos.findAll({order: ['titulo_projeto']},
+controller.projetoList_EmDesenvolvimento = async function (req, res) {
+    const data = await Projetos.findAll({ order: ['titulo_projeto'] },
         {
-            where: {estado: "Em desenvolvimento"}
+            where: { estado: "Em desenvolvimento" }
         }
     )
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar os Projetos",
+                error: error.message
+            });
         });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar os Projetos",
-            error: error.message
-        });
-    });
 }
 
-controller.projetoList_Parado = async function (req, res){
-    const data = await Projetos.findAll({order: ['titulo_projeto']},
+controller.projetoList_Parado = async function (req, res) {
+    const data = await Projetos.findAll({ order: ['titulo_projeto'] },
         {
-            where: {estado: "Parado"}
+            where: { estado: "Parado" }
         }
     )
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar os Projetos",
+                error: error.message
+            });
         });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar os Projetos",
-            error: error.message
-        });
-    });
 }
 
-controller.projetoList_Concluidos = async function (req, res){
-    const data = await Projetos.findAll({order: ['titulo_projeto']},
+controller.projetoList_Concluidos = async function (req, res) {
+    const data = await Projetos.findAll({ order: ['titulo_projeto'] },
         {
-            where: {estado: "Concluído"}
+            where: { estado: "Concluído" }
         }
     )
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar os Projetos",
+                error: error.message
+            });
         });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar os Projetos",
-            error: error.message
-        });
-    });
 }
 
-controller.projetoGet = async function (req, res){
+controller.projetoGet = async function (req, res) {
     const { id } = req.params;
     const data = await Projetos.findAll({
         where: { id_projeto: id }
     })
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
-        });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a encontrar o Projeto",
-            error: error
-        });
-    })
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a encontrar o Projeto",
+                error: error
+            });
+        })
 }
 
-controller.projetoDelete = async function (req, res){
+controller.projetoDelete = async function (req, res) {
     const { id } = req.params;
     const data = await Projetos.destroy({
-        where: {id_projeto: id}
+        where: { id_projeto: id }
     })
-    .then(function() {
-        res.status(200).json({
-            success: true,
-            message: "Projeto apagado"
+        .then(function () {
+            res.status(200).json({
+                success: true,
+                message: "Projeto apagado"
+            })
         })
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a apagar o Projeto",
-            error: error.message
-        });
-    })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a apagar o Projeto",
+                error: error.message
+            });
+        })
 }
 
-controller.projetoUpdate = async function (req, res){
+controller.projetoUpdate = async function (req, res) {
     const { id } = req.params;
     const { id_ideia, titulo_projeto, estado, data_atribuicao, descricao, objetivos, data_inicio, data_final_prevista } = req.body;
     const data = await Projetos.update({
@@ -176,22 +178,22 @@ controller.projetoUpdate = async function (req, res){
         data_inicio: data_inicio,
         data_final_prevista: data_final_prevista,
         updated_at: getDate()
-    },{
-        where: {id_utilizador: id}
+    }, {
+        where: { id_utilizador: id }
     })
-    .then(function() {
-        res.status(200).json({
-            success: true,
-            message: "AuditLog Projeto"
+        .then(function () {
+            res.status(200).json({
+                success: true,
+                message: "AuditLog Projeto"
+            })
         })
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a atualizar o Projeto",
-            error: error.message
-        });
-    })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a atualizar o Projeto",
+                error: error.message
+            });
+        })
 }
 
 

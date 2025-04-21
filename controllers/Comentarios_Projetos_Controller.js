@@ -1,10 +1,11 @@
 const Comentarios_Projetos = require('../models/Comentarios_Projetos');
+const Perfis = require('../models/Perfis');
 const fs = require('fs');
 const path = require('path');
 var sequelize = require('../models/database');
 const controller = {};
 
-function getDate(){
+function getDate() {
     let now = new Date();
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
@@ -15,39 +16,50 @@ function getDate(){
     return today;
 }
 
-controller.comentarioProjetoCreate = async function (req, res){
-    const { id_projeto, id_ideia, autor, comentario} = req.body;
+controller.comentarioProjetoCreate = async function (req, res) {
+    const { id_projeto, id_ideia, autor, comentario } = req.body;
     const anexo = req.file ? req.file.path : null;
 
+    const toNullIfStringNull = (value) => (value === "null" || value === "undefined") ? null : value;
+
     const data = await Comentarios_Projetos.create({
-        id_projeto: id_projeto,
-        id_ideia: id_ideia,
+        id_projeto: toNullIfStringNull(id_projeto),
+        id_ideia: toNullIfStringNull(id_ideia),
         autor: autor,
         comentario: comentario,
         anexo: anexo,
         created_at: getDate(),
         updated_at: getDate()
     })
-    .then(function(data){
-        res.status(200).json({
-            success: true,
-            message: "Projeto criado",
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                message: "Comentario criado com sucesso no projeto",
+                data: data
+            })
         })
-    })
-    .catch(error =>
-        res.status(500).json({
-            success: false,
-            message: "Erro a criar o Projeto",
-            error: error.message
-        })
-    )
+        .catch(error => {
+            console.log(error)
+            res.status(500).json({
+                success: false,
+                message: "Erro a criar o Projeto",
+                error: error.message
+            })
+        }
+        )
 }
 
-controller.comentarioProjetoList = async function (req, res){
+controller.comentarioProjetoList = async function (req, res) {
     try {
         const data = await Comentarios_Projetos.findAll({
-            order: ['titulo_projeto']
+            order: [['created_at', 'DESC']],
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -71,13 +83,19 @@ controller.comentarioProjetoList = async function (req, res){
     }
 }
 
-controller.comentarioProjetoListPorProjeto = async function (req, res){
+controller.comentarioProjetoListPorProjeto = async function (req, res) {
     const { id } = req.params;
     try {
         const data = await Comentarios_Projetos.findAll({
-            order: ['titulo_projeto']
-        },{
-            where: {id_comentario_projeto: id}
+            order: [['created_at', 'DESC']],
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
+            where: { id_projeto: id }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -101,13 +119,19 @@ controller.comentarioProjetoListPorProjeto = async function (req, res){
     }
 }
 
-controller.comentarioProjetoListPorIdeia = async function (req, res){
+controller.comentarioProjetoListPorIdeia = async function (req, res) {
     const { id } = req.params;
     try {
         const data = await Comentarios_Projetos.findAll({
-            order: ['titulo_projeto']
-        },{
-            where: {id_comentario_projeto: id}
+            order: [['created_at', 'DESC']],
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
+            where: { id_ideia: id }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -131,42 +155,55 @@ controller.comentarioProjetoListPorIdeia = async function (req, res){
     }
 }
 
-controller.comentarioProjetoListPorUser = async function (req, res){
+controller.comentarioProjetoListPorUser = async function (req, res) {
     const { id } = req.params;
     try {
         const data = await Comentarios_Projetos.findAll({
-            order: ['titulo_projeto']
-        },{
-            where: {id_comentario_projeto: id}
-        });
-
-        //Esta parte do código altera, na resposta, a variável anexo
-        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
-        const modifiedData = data.map(item => ({
-            ...item.toJSON(),
-            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
-        }));
-
-        res.status(200).json({
-            success: true,
-            data: modifiedData
-        });
-
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Erro ao listar os Projetos",
-            error: error.message
-        });
-    }
-}
-
-controller.comentarioProjetoGet = async function (req, res){
-    const { id } = req.params;
-
-    try {
-        const data = await Comentarios_Projetos.findAll({
+            order: [['created_at', 'DESC']],
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
             where: { id_comentario_projeto: id }
+        });
+
+        //Esta parte do código altera, na resposta, a variável anexo
+        //Em vez de responder com o nome do ficheiro responde com o link onde o ficheiro está disponível no servidor
+        const modifiedData = data.map(item => ({
+            ...item.toJSON(),
+            anexo: item.anexo ? `${req.protocol}://${req.get('host')}/${item.anexo}` : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: modifiedData
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao listar os Projetos",
+            error: error.message
+        });
+    }
+}
+
+controller.comentarioProjetoGet = async function (req, res) {
+    const { id } = req.params;
+
+    try {
+        const data = await Comentarios_Projetos.findAll({
+            where: { id_comentario_projeto: id },
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+            ],
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -190,24 +227,24 @@ controller.comentarioProjetoGet = async function (req, res){
     }
 }
 
-controller.comentarioProjetoDelete = async function (req, res){
+controller.comentarioProjetoDelete = async function (req, res) {
     const { id } = req.params;
     const data = await Comentarios_Projetos.destroy({
-        where: {id_comentario_projeto: id}
+        where: { id_comentario_projeto: id }
     })
-    .then(function() {
-        res.status(200).json({
-            success: true,
-            message: "Projeto apagado"
+        .then(function () {
+            res.status(200).json({
+                success: true,
+                message: "Projeto apagado"
+            })
         })
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a apagar o Projeto",
-            error: error.message
-        });
-    })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a apagar o Projeto",
+                error: error.message
+            });
+        })
 }
 
 controller.comentarioProjetoUpdate = async function (req, res) {

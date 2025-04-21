@@ -1,4 +1,5 @@
 var Linha_Temporal = require('../models/Linha_Temporal')
+var Perfis = require('../models/Perfis')
 const controller = {};
 
 function getDate(){
@@ -40,7 +41,16 @@ controller.linhaTemporalCreate = async function (req, res){
 }
 
 controller.linhaTemporalList = async function (req, res){
-    const data = await Linha_Temporal.findAll({order: ['created_at']})
+    const data = await Linha_Temporal.findAll({
+        order: ['created_at'],
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+        ],
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -58,7 +68,17 @@ controller.linhaTemporalList = async function (req, res){
 
 controller.linhaTemporalListProjeto = async function (req, res){
     const { id } = req.params;
-    const data = await Linha_Temporal.findAll({order: ['created_at']}, {where: {id_projeto: id}})
+    const data = await Linha_Temporal.findAll({
+        order: ['created_at'],
+        where: {id_projeto: id},
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+        ],
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -76,7 +96,17 @@ controller.linhaTemporalListProjeto = async function (req, res){
 
 controller.linhaTemporalListIdeia = async function (req, res){
     const { id } = req.params;
-    const data = await Linha_Temporal.findAll({order: ['created_at']}, {where: {id_ideia: id}})
+    const data = await Linha_Temporal.findAll({
+        order: ['created_at']},
+        {where: {id_ideia: id},
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+        ],
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -95,7 +125,14 @@ controller.linhaTemporalListIdeia = async function (req, res){
 controller.linhaTemporalGet = async function (req, res){
     const { id } = req.params;
     const data = await Linha_Temporal.findAll({
-        where: { id_registo: id }
+        where: { id_registo: id },
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+        ],
     })
     .then(function(data) {
         res.status(200).json({

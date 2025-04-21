@@ -1,4 +1,6 @@
 var Perfil_Projeto = require('../models/Perfil_Projeto')
+var Perfis = require('../models/Perfis')
+var Projetos = require('../models/Projetos')
 const controller = {};
 
 function getDate(){
@@ -34,8 +36,50 @@ controller.perfilProjetoCreate = async function (req, res){
     )
 }
 
+controller.perfilProjetoCreateMany = async function (req, res){
+    const { perfis, id_projeto } = req.body;
+    
+    try {
+
+        const createdAssociations = await Promise.all(
+            perfis.map(perfil => 
+                Perfil_Projeto.create({
+                    id_perfil: perfil.id_perfil,
+                    id_projeto: id_projeto
+                })
+            )
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Perfis associados ao projeto com sucesso",
+            data: createdAssociations
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao criar associações",
+            error: error.message
+        });
+    }
+}
+
 controller.perfilProjetoList = async function (req, res){
-    const data = await Perfil_Projeto.findAll({order: ['id_perfil']})
+    const data = await Perfil_Projeto.findAll({
+        order: ['id_perfil'],
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+            {
+                model: Projetos,
+                as: 'projeto',
+                required: false
+            }
+        ],
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -54,7 +98,19 @@ controller.perfilProjetoList = async function (req, res){
 controller.perfilProjetoGet = async function (req, res){
     const { id_projeto, id_perfil } = req.params;
     const data = await Perfil_Projeto.findAll({
-        where: { id_projeto: id_projeto, id_perfil: id_perfil }
+        where: { id_projeto: id_projeto, id_perfil: id_perfil },
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+            {
+                model: Projetos,
+                as: 'projeto',
+                required: false
+            }
+        ],
     })
     .then(function(data) {
         res.status(200).json({
@@ -74,7 +130,19 @@ controller.perfilProjetoGet = async function (req, res){
 controller.perfilProjetoGet_Perfil = async function (req, res){
     const { id } = req.params;
     const data = await Perfil_Projeto.findAll({
-        where: { id_perfil: id }
+        where: { id_perfil: id },
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+            {
+                model: Projetos,
+                as: 'projeto',
+                required: false
+            }
+        ],
     })
     .then(function(data) {
         res.status(200).json({
@@ -94,7 +162,19 @@ controller.perfilProjetoGet_Perfil = async function (req, res){
 controller.perfilProjetoGet_Projeto = async function (req, res){
     const { id } = req.params;
     const data = await Perfil_Projeto.findAll({
-        where: { id_projeto: id }
+        where: { id_projeto: id },
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+            {
+                model: Projetos,
+                as: 'projeto',
+                required: false
+            }
+        ],
     })
     .then(function(data) {
         res.status(200).json({

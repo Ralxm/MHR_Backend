@@ -4,6 +4,7 @@ const router = express.Router();
 const controller = require('../controllers/Perfil_Projeto_Controller');
 
 router.post('/create', controller.perfilProjetoCreate);
+router.post('/createMany', controller.perfilProjetoCreateMany);
 router.get('/list', controller.perfilProjetoList);
 router.get('/get/:id_projeto/:id_perfil', controller.perfilProjetoGet) //Lista a associação entre um projeto e um user
 router.get('/listByUser/:id', controller.perfilProjetoGet_Perfil); //Lista todos os projetos a que um utilizador está associado

@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const SequelizeDB = require('./database');
 const Ideia = require('./Ideia')
+const Perfis = require('./Perfis')
 const Projetos = require('./Projetos')
 
 const Linha_Temporal = SequelizeDB.define('linha_temporal', {
@@ -35,6 +36,11 @@ const Linha_Temporal = SequelizeDB.define('linha_temporal', {
     tableName: 'LINHA_TEMPORAL',
     timestamps: false,
     freezeTableName: true
+});
+
+Linha_Temporal.belongsTo(Perfis, {
+    foreignKey: 'created_by',
+    as: "perfil"
 });
 
 module.exports = Linha_Temporal;

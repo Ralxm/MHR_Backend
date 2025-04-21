@@ -26,4 +26,14 @@ const Perfil_Projeto = SequelizeDB.define('perfil_projeto', {
     freezeTableName: true
 });
 
+Perfil_Projeto.belongsTo(Perfis, {
+    foreignKey: 'id_perfil',
+    as: "perfil"
+});
+
+Perfil_Projeto.belongsTo(Projetos, {
+    foreignKey: 'id_projeto',
+    as: "projeto"
+});
+
 module.exports = Perfil_Projeto;

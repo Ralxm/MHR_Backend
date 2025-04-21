@@ -11,7 +11,8 @@ const storage = multer.diskStorage({
         cb(null, 'ficheiros/comentarios_projetos/');
     },
     filename: function (req, file, cb) {
-        cb(null, path.extname(file.originalname));
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
@@ -24,6 +25,6 @@ router.get('/listIdeia/:id', controller.comentarioProjetoListPorIdeia); //Lista 
 router.get('/listUser/:id', controller.comentarioProjetoListPorUser); //Lista todos os comentários feitos por um utilizador em todos os projetos ou ideias
 router.get('/get/:id', controller.comentarioProjetoGet);
 router.put('/delete:id', controller.comentarioProjetoDelete);
-router.post('/update:id',upload.single('anexo'), controller.comentarioProjetoUpdate);
+router.post('/update:id', upload.single('anexo'), controller.comentarioProjetoUpdate);
 
 module.exports = router;
