@@ -17,7 +17,7 @@ const Ideia = SequelizeDB.define('ideia', {
     },
     titulo_ideia: Sequelize.CHAR(256),
     descricao: Sequelize.TEXT,
-    estado: Sequelize.STRING(50),
+    estado: Sequelize.STRING(50), //Em análise, Aceite, Rejeitada
     ficheiro_complementar: Sequelize.TEXT,
     validador: Sequelize.INTEGER,
     comentarios: Sequelize.STRING(2000),
@@ -30,14 +30,24 @@ const Ideia = SequelizeDB.define('ideia', {
     freezeTableName: true
 });
 
-Ideia.afterCreate((ideia, options) => {
+Ideia.belongsTo(Perfis, {
+    foreignKey: 'id_perfil',
+    as: "perfil"
+});
+
+Ideia.belongsTo(Perfis, {
+    foreignKey: 'validador',
+    as: "validadorPerfil"
+});
+
+/*Ideia.afterCreate((ideia, options) => {
     return AuditLog.create({
         utilizador: ideia.id_perfil,
         data_atividade: getDate(),
         tipo_atividade: "Criação Férias",
         descricao: "Utilizador com ID Perfil " + ideia.id_perfil + " fez registo de uma ideia com ID " + ideia.id_ideia + ".",
     })
-})
+})*/
 
 function getDate(){
     let now = new Date();
@@ -49,7 +59,5 @@ function getDate(){
     let today = `${yyyy}-${mm}-${dd}`;
     return today;
 }
-
-
 
 module.exports = Ideia;

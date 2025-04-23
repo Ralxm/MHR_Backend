@@ -1,5 +1,6 @@
 const Ideia = require('../models/Ideia');
 var sequelize = require('../models/database');
+const Perfis = require('../models/Perfis')
 
 const controller = {};
 
@@ -15,7 +16,7 @@ function getDate(){
 }
 
 controller.ideiaCreate = async function (req, res){
-    const { id_perfil, titulo_ideia, descricao, estado, validador, comentarios} = req.body;
+    const { id_perfil, titulo_ideia, descricao, estado} = req.body;
     const ficheiro_complementar = req.file ? req.file.path : null;
 
     const data = await Ideia.create({
@@ -24,8 +25,7 @@ controller.ideiaCreate = async function (req, res){
         descricao: descricao,
         estado: estado,
         ficheiro_complementar: ficheiro_complementar,
-        validador: validador,
-        comentarios: comentarios,
+        validador: null,
         created_at: getDate(),
         updated_at: getDate()
     })
@@ -48,7 +48,19 @@ controller.ideiaCreate = async function (req, res){
 controller.ideiaList = async function (req, res){
     try {
         const data = await Ideia.findAll({
-            order: ['titulo_ideia']
+            order: ['titulo_ideia'],
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                },
+            ],
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -75,8 +87,19 @@ controller.ideiaList = async function (req, res){
 controller.ideiaList_EmAnalise = async function (req, res){
     try {
         const data = await Ideia.findAll({
-            order: ['titulo_ideia']
-        },{
+            order: ['titulo_ideia'],
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                },
+            ],
             where: {estado: "Em análise"}
         });
 
@@ -102,11 +125,22 @@ controller.ideiaList_EmAnalise = async function (req, res){
 }
 
 controller.ideiaList_Aprovada = async function (req, res){
-    const data = await Ideia.findAll({order: ['titulo_projeto']},
-        {
-            where: {estado: "Aprovada"}
-        }
-    )
+    const data = await Ideia.findAll({
+        order: ['titulo_projeto'],
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+            {
+                model: Perfis,
+                as: 'validadorPerfil',
+                required: false
+            },
+        ],
+        where: {estado: "Aprovada"},
+    })
     .then(function(data) {
         res.status(200).json({
             success: true,
@@ -125,8 +159,19 @@ controller.ideiaList_Aprovada = async function (req, res){
 controller.ideiaList_Rejeitada = async function (req, res){
     try {
         const data = await Ideia.findAll({
-            order: ['titulo_ideia']
-        },{
+            order: ['titulo_ideia'],
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                },
+            ],
             where: {estado: "Rejeitada"}
         });
 
@@ -155,8 +200,19 @@ controller.ideiaListUser = async function (req, res){
     const { id } = req.params;
     try {
         const data = await Ideia.findAll({
-            order: ['titulo_ideia']
-        },{
+            order: ['titulo_ideia'],
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                },
+            ],
             where: {id_perfil: id}
         });
 
@@ -186,7 +242,19 @@ controller.ideiaGet = async function (req, res){
 
     try {
         const data = await Ideia.findAll({
-            where: { id_ideia: id }
+            where: { id_ideia: id },
+            include: [
+                {
+                    model: Perfis,
+                    as: 'perfil',
+                    required: false
+                },
+                {
+                    model: Perfis,
+                    as: 'validadorPerfil',
+                    required: false
+                },
+            ],
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
