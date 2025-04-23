@@ -27,6 +27,7 @@ const Perfis = SequelizeDB.define('perfis', {
     },
     nome: Sequelize.TEXT(256),
     email: Sequelize.TEXT(256),
+    numero_mecanografico: Sequelize.TEXT(256),
     morada: Sequelize.TEXT(256),
     telemovel: Sequelize.TEXT(9),
     data_nascimento: Sequelize.DATEONLY,

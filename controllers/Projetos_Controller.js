@@ -14,14 +14,15 @@ function getDate() {
 }
 
 controller.projetoCreate = async function (req, res) {
-    const { id_ideia, titulo_projeto, estado, descricao, objetivos, data_inicio, data_final_prevista } = req.body;
+    const { id_ideia, titulo_projeto, estado, descricao, requisitos, futuras_melhorias, data_inicio, data_final_prevista } = req.body;
     const data = await Projetos.create({
         id_ideia: id_ideia,
         titulo_projeto: titulo_projeto,
         estado: estado,
         data_atribuicao: getDate(),
         descricao: descricao,
-        objetivos: objetivos,
+        requisitos: requisitos,
+        futuras_melhorias: futuras_melhorias,
         data_inicio: data_inicio,
         data_final_prevista: data_final_prevista,
         created_at: getDate(),
@@ -167,24 +168,24 @@ controller.projetoDelete = async function (req, res) {
 
 controller.projetoUpdate = async function (req, res) {
     const { id } = req.params;
-    const { id_ideia, titulo_projeto, estado, data_atribuicao, descricao, objetivos, data_inicio, data_final_prevista } = req.body;
+    const { id_projeto, titulo_projeto, estado, descricao, requisitos, futuras_melhorias, data_inicio, data_final_prevista } = req.body;
     const data = await Projetos.update({
-        id_ideia: id_ideia,
+        id_projeto: id_projeto,
         titulo_projeto: titulo_projeto,
         estado: estado,
-        data_atribuicao: data_atribuicao,
         descricao: descricao,
-        objetivos: objetivos,
+        requisitos: requisitos,
+        futuras_melhorias: futuras_melhorias,
         data_inicio: data_inicio,
         data_final_prevista: data_final_prevista,
         updated_at: getDate()
     }, {
-        where: { id_utilizador: id }
+        where: { id_projeto: id }
     })
         .then(function () {
             res.status(200).json({
                 success: true,
-                message: "AuditLog Projeto"
+                message: "Projeto atualizado com sucesso"
             })
         })
         .catch(error => {

@@ -11,8 +11,8 @@ router.get('/listDesenvolvimento', controller.projetoList_EmDesenvolvimento); //
 router.get('/listParado', controller.projetoList_Parado); //Lista todos os projetos em pausa
 router.get('/listConcluidos', controller.projetoList_Concluidos); //Lista todos os projetos concluídos
 router.get('/get/:id', controller.projetoGet);
-router.put('/delete:id', controller.projetoDelete);
-router.post('/update:id', controller.projetoUpdate);
+router.put('/delete/:id', controller.projetoDelete);
+router.post('/update/:id', controller.projetoUpdate);
 
 
 /*router.get('/listAll', projetosController.projetos_lista);

@@ -211,4 +211,56 @@ controller.perfilProjetoDelete = async function (req, res){
     })
 }
 
+controller.perfilProjetoUpdateMany = async function (req, res) {
+    const { originalProfiles, updatedProfiles, id_projeto } = req.body;
+    
+    try {
+        const originalIds = new Set(originalProfiles.map(p => p.id_perfil));
+        const updatedIds = new Set(updatedProfiles.map(p => p.id_perfil));
+
+        const profilesToAdd = updatedProfiles.filter(
+            p => !originalIds.has(p.id_perfil)
+        );
+
+        const profilesToRemove = originalProfiles.filter(
+            p => !updatedIds.has(p.id_perfil)
+        );
+
+        const createdAssociations = await Promise.all(
+            profilesToAdd.map(perfil => 
+                Perfil_Projeto.create({
+                    id_perfil: perfil.id_perfil,
+                    id_projeto: id_projeto
+                })
+            )
+        );
+
+        const removedAssociations = await Promise.all(
+            profilesToRemove.map(perfil =>
+                Perfil_Projeto.destroy({
+                    where: {
+                        id_perfil: perfil.id_perfil,
+                        id_projeto: id_projeto
+                    }
+                })
+            )
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Perfis do projeto atualizados com sucesso",
+            data: {
+                added: createdAssociations,
+                removed: removedAssociations
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao atualizar associações de perfis",
+            error: error.message
+        });
+    }
+}
+
 module.exports = controller;
