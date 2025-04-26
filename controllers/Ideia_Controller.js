@@ -300,11 +300,15 @@ controller.ideiaDelete = async function (req, res){
 
 controller.ideiaUpdate = async function (req, res){
     const { id } = req.params;
-    const { titulo_ideia, descricao, estado, validador, comentarios} = req.body;
+    const { titulo_ideia, descricao, estado, validador } = req.body;
+
+    const toNullIfStringNull = (value) => (value === "null" || value === "undefined") ? null : value;
 
     try {
         //Encontra a ideia que vamos atualizar
-        const ideia = await Ideia.findOne({ where: { id_ideia: id } });
+        const ideia = await Ideia.findOne({
+            where: { id_ideia: id }
+        });
 
         //Se não encontrar o comentário responde com um erro
         if (!ideia) {
@@ -318,7 +322,7 @@ controller.ideiaUpdate = async function (req, res){
         //Se não for inserido nenhum ficheiro diferente/novo na atualização então o ficheiro anterior mantém-se
         let ficheiro_complementar = ideia.ficheiro_complementar;
         if (req.file) {
-            if (ficheiro_complementarxo) {
+            if (ficheiro_complementar) {
                 fs.unlinkSync(path.resolve(ficheiro_complementar));
             }
             ficheiro_complementar = req.file.path;
@@ -329,8 +333,7 @@ controller.ideiaUpdate = async function (req, res){
             descricao: descricao,
             estado: estado,
             ficheiro_complementar: ficheiro_complementar,
-            validador: validador,
-            comentarios: comentarios,
+            validador: toNullIfStringNull(validador),
             updated_at: getDate()
         }, {
             where: { id_ideia: id }
@@ -349,6 +352,83 @@ controller.ideiaUpdate = async function (req, res){
         });
     }
 }
+
+controller.aceitarIdeia = async function (req, res){
+    const { id } = req.params;
+
+    try {
+        //Encontra a ideia que vamos atualizar
+        const ideia = await Ideia.findOne({
+            where: { id_ideia: id }
+        });
+
+        //Se não encontrar o comentário responde com um erro
+        if (!ideia) {
+            return res.status(404).json({
+                success: false,
+                message: "Ideia não encontrada"
+            });
+        }
+
+        await Ideia.update({
+            estado: "Aceite",
+            updated_at: getDate()
+        }, {
+            where: { id_ideia: id }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Ideia aceite com sucesso"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao aceitar a ideia",
+            error: error.message
+        });
+    }
+}
+
+controller.rejeitarIdeia = async function (req, res){
+    const { id } = req.params;
+
+    try {
+        //Encontra a ideia que vamos atualizar
+        const ideia = await Ideia.findOne({
+            where: { id_ideia: id }
+        });
+
+        //Se não encontrar o comentário responde com um erro
+        if (!ideia) {
+            return res.status(404).json({
+                success: false,
+                message: "Ideia não encontrada"
+            });
+        }
+
+        await Ideia.update({
+            estado: "Rejeitada",
+            updated_at: getDate()
+        }, {
+            where: { id_ideia: id }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Ideia rejeitada com sucesso"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao rejeitar a ideia",
+            error: error.message
+        });
+    }
+}
+
 
 
 /*controllers.adicionar_ideia = async (req, res) => {

@@ -24,8 +24,10 @@ router.get('/listAprovada', controller.ideiaList_Aprovada); //Lista todas as ide
 router.get('/listRejeitada', controller.ideiaList_Rejeitada); //Lista todas as ideias rejeitadas
 router.get('/listUser/:id', controller.ideiaListUser); //Lista todas as ideias sugeridas por um dado utilizador
 router.get('/get/:id', controller.ideiaGet);
-router.put('/delete:id', controller.ideiaDelete);
-router.post('/update:id', controller.ideiaUpdate);
+router.put('/delete/:id', controller.ideiaDelete);
+router.post('/update/:id', upload.single('ficheiro_complementar'), controller.ideiaUpdate);
+router.post('/aceitar/:id', controller.aceitarIdeia);
+router.post('/rejeitar/:id', controller.rejeitarIdeia);
 
 /*router.post('/create', upload.single('ficheiroComplementar'), ideiasController.adicionar_ideia);
 router.get('/uploads/files/:ficheiro_complementar', ideiasController.downlad_file);
