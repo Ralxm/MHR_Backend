@@ -154,7 +154,7 @@ controller.projetoDelete = async function (req, res) {
         .then(function () {
             res.status(200).json({
                 success: true,
-                message: "Projeto apagado"
+                message: "Projeto apagado com sucesso"
             })
         })
         .catch(error => {

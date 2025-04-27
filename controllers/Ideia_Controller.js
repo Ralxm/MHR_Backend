@@ -286,7 +286,7 @@ controller.ideiaDelete = async function (req, res){
     .then(function() {
         res.status(200).json({
             success: true,
-            message: "Projeto apagado"
+            message: "Ideia apagada com sucesso"
         })
     })
     .catch(error => {
