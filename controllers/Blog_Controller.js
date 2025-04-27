@@ -1,4 +1,5 @@
 const Blog = require('../models/Blog');
+const Perfis = require('../models/Perfis');
 const multer = require('multer');
 var sequelize = require('../models/database');
 
@@ -7,7 +8,7 @@ const controller = {};
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage }).single('imagem');
 
-function getDate(){
+function getDate() {
     let now = new Date();
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
@@ -18,215 +19,255 @@ function getDate(){
     return today;
 }
 
-controller.blogCreate = async function (req, res){
-    upload(req, res, async (err) =>{
-        if(err){
-            return res.status(500).json({
-                success: false,
-                message: "Erro ao fazer upload da imagem",
-                error: err.message
+controller.blogCreate = async function (req, res) {
+    const { id_perfil, tipo, titulo, texto, data_noticia, local_visita, data_visita, duracao_visita, motivo_visita, estado } = req.body;
+    console.log(req.file)
+    const imagem = req.file ? req.file.path : null
+
+    try {
+        const data = await Blog.create({
+            id_perfil: id_perfil,
+            tipo: tipo,
+            titulo: titulo,
+            texto: texto,
+            data_noticia: data_noticia,
+            local_visita: local_visita,
+            data_visita: data_visita,
+            duracao_visita: duracao_visita,
+            motivo_visita: motivo_visita,
+            estado: estado,
+            created_at: getDate(),
+            updated_at: getDate(),
+            imagem: imagem,
+            views: 0
+        })
+
+        res.status(200).json({
+            success: true,
+            message: "Publicação criada no blog",
+            data: data
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao criar a publicação no blog",
+            error: error,
+        });
+    }
+}
+
+controller.blogList = async function (req, res) {
+    const data = await Blog.findAll({
+        order: [['created_at', 'DESC']],
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+            {
+                model: Perfis,
+                as: 'validadorPerfil',
+                required: false
+            },
+        ],
+    })
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
             });
-        }
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar as publicações",
+                error: error.message
+            });
+        });
+}
 
-        const { id_perfil, tipo, titulo, texto, data_noticia, local_visita, data_visita, duracao_visita, motivo_visita, estado, validador, data_validacao, imagem } = req.body;
-
-        try{
-            const data = await Blog.create({
-                id_perfil: id_perfil,
-                tipo: tipo,
-                titulo: titulo,
-                texto: texto,
-                data_noticia: data_noticia,
-                local_visita: local_visita,
-                data_visita: data_visita,
-                duracao_visita: duracao_visita,
-                motivo_visita: motivo_visita,
-                estado: estado,
-                validador: validador,
-                data_validacao: data_validacao,
-                created_at: getDate(),
-                updated_at: getDate(),
-                imagem:  req.file ? req.file.buffer : null,
-                views: 0
+controller.blogListUser = async function (req, res) {
+    const { id } = req.params;
+    const data = await Blog.findAll({
+        order: [['created_at', 'DESC']],
+        where: { id_perfil: id },
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+            {
+                model: Perfis,
+                as: 'validadorPerfil',
+                required: false
+            },
+        ],
+    })
+        .then(function (data) {
+            const posts = data.map(post => {
+                if (post.imagem) {
+                    post.imagem = post.imagaem.toString('base64')
+                }
+                return post;
             })
+            res.status(200).json({
+                success: true,
+                data: posts
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar as publicações",
+                error: error.message
+            });
+        });
+}
+
+controller.blogListValidadas = async function (req, res) {
+    const data = await Blog.findAll({
+        order: [['created_at', 'DESC']],
+        where: { estado: "Validada" },
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+            {
+                model: Perfis,
+                as: 'validadorPerfil',
+                required: false
+            },
+        ],
+    })
+        .then(function (data) {
+            const posts = data.map(post => {
+                if (post.imagem) {
+                    post.imagem = post.imagaem.toString('base64')
+                }
+                return post;
+            })
+            res.status(200).json({
+                success: true,
+                data: posts
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar as publicações",
+                error: error.message
+            });
+        });
+}
+
+controller.blogListPorValidar = async function (req, res) {
+    const data = await Blog.findAll({ order: ['titulo_vaga'] }, { where: { estado: "Por Validar" } })
+        .then(function (data) {
+            const posts = data.map(post => {
+                if (post.imagem) {
+                    post.imagem = post.imagaem.toString('base64')
+                }
+                return post;
+            })
+            res.status(200).json({
+                success: true,
+                data: posts
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar as publicações",
+                error: error.message
+            });
+        });
+}
+
+controller.blogListRejeitada = async function (req, res) {
+    const data = await Blog.findAll({ order: ['titulo_vaga'] }, { where: { estado: "Rejeitada" } })
+        .then(function (data) {
+            const posts = data.map(post => {
+                if (post.imagem) {
+                    post.imagem = post.imagaem.toString('base64')
+                }
+                return post;
+            })
+            res.status(200).json({
+                success: true,
+                data: posts
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar as publicações",
+                error: error.message
+            });
+        });
+}
+
+
+controller.blogGet = async function (req, res) {
+    const { id } = req.params;
+    const data = await Blog.findAll({
+        where: { id_publicacao: id },
+        include: [
+            {
+                model: Perfis,
+                as: 'perfil',
+                required: false
+            },
+            {
+                model: Perfis,
+                as: 'validadorPerfil',
+                required: false
+            },
+        ],
+    })
+        .then(function (data) {
+            const posts = data.map(post => {
+                if (post.IMAGEM) {
+                    post.IMAGEM = post.IMAGEM.toString('base64');
+                }
+                return post;
+            });
 
             res.status(200).json({
                 success: true,
-                message: "Publicação criada no blog",
-                data: data
+                data: posts
             });
-        } catch(error){
+        })
+        .catch(error => {
             res.status(500).json({
                 success: false,
-                message: "Erro ao criar a publicação no blog",
-                error: error,
+                message: "Erro a encontrar a publicação",
+                error: error
             });
-        }
-    })
-}
-
-controller.blogList = async function (req, res){
-    const data = await Blog.findAll({order: ['titulo_vaga']})
-    .then(function(data) {
-        const posts = data.map(post => {
-            if(post.imagem){
-                post.imagem = post.imagaem.toString('base64')
-            }
-            return post;
         })
-        res.status(200).json({
-            success: true,
-            data: posts
-        });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar as publicações",
-            error: error.message
-        });
-    });
 }
 
-controller.blogListUser = async function (req, res){
-    const { id } = req.params;
-    const data = await Blog.findAll({order: ['titulo_vaga']},{where: {id_perfil: id}})
-    .then(function(data) {
-        const posts = data.map(post => {
-            if(post.imagem){
-                post.imagem = post.imagaem.toString('base64')
-            }
-            return post;
-        })
-        res.status(200).json({
-            success: true,
-            data: posts
-        });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar as publicações",
-            error: error.message
-        });
-    });
-}
-
-controller.blogListValidadas = async function (req, res){
-    const data = await Blog.findAll({order: ['titulo_vaga']},{where: {estado:"Validada"}})
-    .then(function(data) {
-        const posts = data.map(post => {
-            if(post.imagem){
-                post.imagem = post.imagaem.toString('base64')
-            }
-            return post;
-        })
-        res.status(200).json({
-            success: true,
-            data: posts
-        });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar as publicações",
-            error: error.message
-        });
-    });
-}
-
-controller.blogListPorValidar = async function (req, res){
-    const data = await Blog.findAll({order: ['titulo_vaga']},{where: {estado:"Por Validar"}})
-    .then(function(data) {
-        const posts = data.map(post => {
-            if(post.imagem){
-                post.imagem = post.imagaem.toString('base64')
-            }
-            return post;
-        })
-        res.status(200).json({
-            success: true,
-            data: posts
-        });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar as publicações",
-            error: error.message
-        });
-    });
-}
-
-controller.blogListRejeitada = async function (req, res){
-    const data = await Blog.findAll({order: ['titulo_vaga']},{where: {estado:"Rejeitada"}})
-    .then(function(data) {
-        const posts = data.map(post => {
-            if(post.imagem){
-                post.imagem = post.imagaem.toString('base64')
-            }
-            return post;
-        })
-        res.status(200).json({
-            success: true,
-            data: posts
-        });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar as publicações",
-            error: error.message
-        });
-    });
-}
-
-
-controller.blogGet = async function (req, res){
-    const { id } = req.params;
-    const data = await Blog.findAll({
-        where: { id_publicacao: id }
-    })
-    .then(function(data) {
-        const posts = data.map(post => {
-            if (post.IMAGEM) {
-                post.IMAGEM = post.IMAGEM.toString('base64');
-            }
-            return post;
-        });
-
-        res.status(200).json({
-            success: true,
-            data: posts
-        });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a encontrar a publicação",
-            error: error
-        });
-    })
-}
-
-controller.blogDelete = async function (req, res){
+controller.blogDelete = async function (req, res) {
     const { id } = req.params;
     const data = await Blog.destroy({
-        where: {id_publicacao: id}
+        where: { id_publicacao: id }
     })
-    .then(function() {
-        res.status(200).json({
-            success: true,
-            message: "Vaga apagada"
+        .then(function () {
+            res.status(200).json({
+                success: true,
+                message: "Vaga apagada"
+            })
         })
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a apagar a publicação",
-            error: error.message
-        });
-    })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a apagar a publicação",
+                error: error.message
+            });
+        })
 }
 
 controller.blogUpdate = async function (req, res) {
@@ -251,7 +292,7 @@ controller.blogUpdate = async function (req, res) {
                 });
             }
 
-            let imagem = blogPost.imagem; 
+            let imagem = blogPost.imagem;
             if (req.file) {
                 imagem = req.file.buffer;
             }
@@ -293,44 +334,44 @@ controller.blogValidar = async function (req, res) {
     const { id } = req.params;
     const data = await Blog.update({
         estado: "Validada"
-    },{
-        where: {id_publicacao: id}
+    }, {
+        where: { id_publicacao: id }
     })
-    .then(function() {
-        res.status(200).json({
-            success: true,
-            message: "Publicação aprovada com sucesso"
+        .then(function () {
+            res.status(200).json({
+                success: true,
+                message: "Publicação aprovada com sucesso"
+            })
         })
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a aprovar a publicação",
-            error: error.message
-        });
-    })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a aprovar a publicação",
+                error: error.message
+            });
+        })
 };
 
 controller.blogRejeitar = async function (req, res) {
     const { id } = req.params;
     const data = await Blog.update({
         estado: "Rejeitada"
-    },{
-        where: {id_publicacao: id}
+    }, {
+        where: { id_publicacao: id }
     })
-    .then(function() {
-        res.status(200).json({
-            success: true,
-            message: "Publicação rejeitada com sucesso"
+        .then(function () {
+            res.status(200).json({
+                success: true,
+                message: "Publicação rejeitada com sucesso"
+            })
         })
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a rejeitar a publicação",
-            error: error.message
-        });
-    })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a rejeitar a publicação",
+                error: error.message
+            });
+        })
 };
 
 

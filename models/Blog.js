@@ -28,7 +28,7 @@ const Blog = SequelizeDB.define('blog', {
     data_validacao: Sequelize.DATEONLY,
     created_at: Sequelize.DATE,
     updated_at: Sequelize.DATE,
-    imagem: Sequelize.BLOB,
+    imagem: Sequelize.TEXT,
     views: Sequelize.INTEGER
 },
 {
@@ -37,7 +37,17 @@ const Blog = SequelizeDB.define('blog', {
     freezeTableName: true
 });
 
-Blog.afterCreate((blog, options) => {
+Blog.belongsTo(Perfis, {
+    foreignKey: 'id_perfil',
+    as: "perfil"
+});
+
+Blog.belongsTo(Perfis, {
+    foreignKey: 'validador',
+    as: "validadorPerfil"
+});
+
+/*Blog.afterCreate((blog, options) => {
     return AuditLog.create({
         utilizador: blog.id_perfil,
         data: getDate(),
@@ -55,6 +65,6 @@ function getDate(){
     if (mm < 10) mm = '0' + mm;
     let today = `${yyyy}-${mm}-${dd}`;
     return today;
-}
+}*/
 
 module.exports = Blog;
