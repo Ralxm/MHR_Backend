@@ -355,6 +355,7 @@ controller.ideiaUpdate = async function (req, res){
 
 controller.aceitarIdeia = async function (req, res){
     const { id } = req.params;
+    const { id_perfil } = req.body;
 
     try {
         //Encontra a ideia que vamos atualizar
@@ -372,6 +373,7 @@ controller.aceitarIdeia = async function (req, res){
 
         await Ideia.update({
             estado: "Aceite",
+            validador: id_perfil,
             updated_at: getDate()
         }, {
             where: { id_ideia: id }
@@ -393,6 +395,7 @@ controller.aceitarIdeia = async function (req, res){
 
 controller.rejeitarIdeia = async function (req, res){
     const { id } = req.params;
+    const { id_perfil } = req.body;
 
     try {
         //Encontra a ideia que vamos atualizar
@@ -410,6 +413,7 @@ controller.rejeitarIdeia = async function (req, res){
 
         await Ideia.update({
             estado: "Rejeitada",
+            validador: id_perfil,
             updated_at: getDate()
         }, {
             where: { id_ideia: id }

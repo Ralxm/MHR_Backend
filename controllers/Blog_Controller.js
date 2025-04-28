@@ -332,8 +332,12 @@ controller.blogUpdate = async function (req, res) {
 
 controller.blogValidar = async function (req, res) {
     const { id } = req.params;
+    const { id_perfil } = req.body;
     const data = await Blog.update({
-        estado: "Validada"
+        estado: "Aprovada",
+        validador: id_perfil,
+        data_validacao: getDate(),
+        updated_at: getDate()
     }, {
         where: { id_publicacao: id }
     })
@@ -354,8 +358,12 @@ controller.blogValidar = async function (req, res) {
 
 controller.blogRejeitar = async function (req, res) {
     const { id } = req.params;
+    const { id_perfil } = req.body;
     const data = await Blog.update({
-        estado: "Rejeitada"
+        estado: "Rejeitada",
+        validador: id_perfil,
+        data_validacao: getDate(),
+        updated_at: getDate()
     }, {
         where: { id_publicacao: id }
     })
@@ -374,6 +382,39 @@ controller.blogRejeitar = async function (req, res) {
         })
 };
 
+controller.blogVer = async function (req, res) {
+    const { id } = req.params;
+    
+    try {
+        const blog = await Blog.findOne({
+            where: { id_publicacao: id }
+        });
+
+        if (!blog) {
+            return res.status(404).json({
+                success: false,
+                message: "Publicação não encontrada"
+            });
+        }
+
+        await Blog.update({
+            views: blog.views + 1
+        }, {
+            where: { id_publicacao: id }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Visualização adicionada com sucesso"
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro ao adicionar visualização",
+            error: error.message
+        });
+    }
+};
 
 /*controllers.publicacoes_lista = async (req, res) => {
     try {

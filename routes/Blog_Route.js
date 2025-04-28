@@ -26,8 +26,9 @@ router.get('/list/rejeitada', controller.blogListRejeitada); //Lista todos as pu
 router.get('/get/:id', controller.blogGet);
 router.put('/delete/:id', controller.blogDelete);
 router.post('/update/:id', upload.single('imagem'), controller.blogUpdate);
-router.post('/validar/:id', controller.blogValidar); //Controller para validar uma publicação
+router.post('/aceitar/:id', controller.blogValidar); //Controller para validar uma publicação
 router.post('/rejeitar/:id',  controller.blogRejeitar); //Controller para rejeitar uma publicação
+router.put('/view/:id',  controller.blogVer); //Controller para aumentar a view de um blog em um
 
 /*router.get('/listAll', blogController.publicacoes_lista);
 router.get('/list/validadas', blogController.publicacoes_lista_validadas);
