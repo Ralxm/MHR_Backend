@@ -12,6 +12,6 @@ router.get('/getUtilizador/:id', controller.perfisGetUtilizador); //Lista um uti
 router.get('/getTelemovel/:tlm', controller.perfisGetTelemovel); //Lista um utilizador por Telemovel
 router.get('/getEmail/:email', controller.perfisGetEmail); //Lista um utilizador por Email
 router.put('/delete/:id', controller.perfisDelete);
-router.put('/update/:id', controller.perfisDelete);
+router.post('/update/:id', controller.perfisUpdate);
 
 module.exports = router;

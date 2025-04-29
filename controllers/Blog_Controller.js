@@ -258,7 +258,7 @@ controller.blogDelete = async function (req, res) {
         .then(function () {
             res.status(200).json({
                 success: true,
-                message: "Vaga apagada"
+                message: "Publicação apagada com sucesso"
             })
         })
         .catch(error => {
@@ -280,6 +280,8 @@ controller.blogUpdate = async function (req, res) {
             });
         }
 
+        const toNullIfStringNull = (value) => (value === "null" || value === "undefined") ? null : value;
+
         const { id } = req.params;
         const { tipo, titulo, texto, data_noticia, local_visita, data_visita, duracao_visita, motivo_visita, estado, validador, data_validacao } = req.body;
 
@@ -297,30 +299,32 @@ controller.blogUpdate = async function (req, res) {
                 imagem = req.file.buffer;
             }
 
-            await Blog.update({
+            const data = await Blog.update({
                 tipo: tipo,
                 titulo: titulo,
                 texto: texto,
-                data_noticia: data_noticia,
-                local_visita: local_visita,
-                data_visita: data_visita,
-                duracao_visita: duracao_visita,
-                motivo_visita: motivo_visita,
+                data_noticia: toNullIfStringNull(data_noticia),
+                local_visita: toNullIfStringNull(local_visita),
+                data_visita: toNullIfStringNull(data_visita),
+                duracao_visita: toNullIfStringNull(duracao_visita),
+                motivo_visita: toNullIfStringNull(motivo_visita),
                 estado: estado,
-                validador: validador,
-                data_validacao: data_validacao,
+                validador: toNullIfStringNull(validador),
+                data_validacao: toNullIfStringNull(data_validacao),
                 updated_at: getDate(),
-                imagem: imagem
+                imagem: toNullIfStringNull(imagem)
             }, {
                 where: { id_publicacao: id }
             });
 
             res.status(200).json({
                 success: true,
-                message: "Publicação atualizada com sucesso"
+                message: "Publicação atualizada com sucesso",
+                data: id
             });
 
         } catch (error) {
+            console.log(error)
             res.status(500).json({
                 success: false,
                 message: "Erro ao atualizar a publicação",

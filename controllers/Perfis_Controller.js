@@ -197,10 +197,9 @@ controller.perfisDelete = async function (req, res){
 
 controller.perfisUpdate = async function (req, res){
     const { id } = req.params;
-    const { id_departamento, id_utilizador, nome, email, morada, telemovel, data_nascimento, distrito } = req.body;
+    const { id_departamento, nome, email, morada, telemovel, data_nascimento, distrito } = req.body;
     const data = await Perfis.update({
         id_departamento: id_departamento,
-        id_utilizador: id_utilizador,
         nome: nome,
         email: email,
         morada: morada,
@@ -209,18 +208,19 @@ controller.perfisUpdate = async function (req, res){
         distrito: distrito,
         updated_at: getDate()
     },{
-        where: {id_utilizador: id}
+        where: {id_perfil: id}
     })
     .then(function() {
         res.status(200).json({
             success: true,
-            message: "AuditLog Apagado"
+            message: "Perfil atualizado com sucesso"
         })
     })
     .catch(error => {
+        console.log(error)
         res.status(500).json({
             success: false,
-            message: "Erro a apagar o AuditLog",
+            message: "Erro a atualizar o perfil",
             error: error.message
         });
     })
