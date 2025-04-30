@@ -10,14 +10,14 @@ controller.tipoFaltasCreate = async function (req, res){
     .then(function(data){
         res.status(200).json({
             success: true,
-            message: "Tipo de utilizador criado",
+            message: "Tipo de falta criado",
             data: data
         })
     })
     .catch(error =>
         res.status(500).json({
             success: false,
-            message: "Erro a criar o tipo de utilizador",
+            message: "Erro a criar o tipo de falta",
             error: error.message
         })
     )
@@ -34,7 +34,7 @@ controller.tipoFaltasList = async function (req, res){
     .catch(error => {
         res.status(500).json({
             success: false,
-            message: "Erro a listar os tipos de utilizador",
+            message: "Erro a listar os tipos de falta",
             error: error.message
         });
     });
@@ -54,7 +54,7 @@ controller.tipoFaltasGet = async function (req, res){
     .catch(error => {
         res.status(500).json({
             success: false,
-            message: "Erro a encontrar o tipo de utilizador",
+            message: "Erro a encontrar o tipo de falta",
             error: error
         });
     })
@@ -68,13 +68,13 @@ controller.tipoFaltasDelete = async function (req, res){
     .then(function() {
         res.status(200).json({
             success: true,
-            message: "Tipo de utilizador apagado"
+            message: "Tipo de falta apagado"
         })
     })
     .catch(error => {
         res.status(500).json({
             success: false,
-            message: "Erro a apagar o tipo de utilizador",
+            message: "Erro a apagar o tipo de falta",
             error: error.message
         });
     })
@@ -92,13 +92,14 @@ controller.tipoFaltasUpdate = async function (req, res){
     .then(function() {
         res.status(200).json({
             success: true,
-            message: "Tipo de utilizador Apagado"
+            message: "Tipo de falta atualizado"
         })
     })
     .catch(error => {
+        console.log(error)
         res.status(500).json({
             success: false,
-            message: "Erro a apagar o tipo de utilizador",
+            message: "Erro a atualizar o tipo de falta",
             error: error.message
         });
     })
