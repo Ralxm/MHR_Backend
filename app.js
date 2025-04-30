@@ -111,6 +111,17 @@ async function initializeDatabase() {
   //CRIA O TIPO DE FALTAS
   criarTipoFaltas();
 
+  //CRIA A EMPRESA NA BASE DE DADOS
+  let empresa;
+  const empresaCount = await _Empresas.count();
+  if(empresaCount == 0){
+    empresa = await _Empresas.create({
+      nome_empresa: "Vision4You",
+      contacto_empresa: '912345678',
+      email_empresa: 'email@email.com'
+    })
+  }
+
   //CRIA O DEPARTAMENTO INICIAL
   let departamento;
   const departamentoCount = await _Departamento.count();

@@ -32,7 +32,7 @@ controllers.empresaUpdate = async (req, res) => {
     .catch(error => {
         return error;
     });
-    res.json({success: true, data: data});
+    res.json({success: true, data: data, message: 'Informações da empresa atualizadas com sucesso'});
 }
 
 module.exports = controllers;

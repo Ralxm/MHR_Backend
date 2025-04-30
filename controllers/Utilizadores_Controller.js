@@ -120,7 +120,6 @@ controller.utilizadoresCreate = async function (req, res) {
             })
         )
 
-    console.log(data)
     if (data) {
         await AuditLog.create({
             utilizador: user.id_utilizador,
@@ -132,7 +131,10 @@ controller.utilizadoresCreate = async function (req, res) {
 }
 
 controller.utilizadoresList = async function (req, res) {
-    const data = await Utilizadores.findAll({ order: ['nome_utilizador'] })
+    const data = await Utilizadores.findAll({
+        order: ['nome_utilizador'],
+        attributes: ['id_utilizador', 'id_tipo', 'nome_utilizador', 'estado', 'created_at', 'updated_at', 'token_resgate', 'validade_token'],
+    })
         .then(function (data) {
             res.status(200).json({
                 success: true,

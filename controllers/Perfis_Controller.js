@@ -197,7 +197,7 @@ controller.perfisDelete = async function (req, res){
 
 controller.perfisUpdate = async function (req, res){
     const { id } = req.params;
-    const { id_departamento, nome, email, morada, telemovel, data_nascimento, distrito } = req.body;
+    const { id_departamento, nome, email, morada, telemovel, data_nascimento, distrito, numero_mecanografico } = req.body;
     const data = await Perfis.update({
         id_departamento: id_departamento,
         nome: nome,
@@ -206,6 +206,7 @@ controller.perfisUpdate = async function (req, res){
         telemovel: telemovel,
         data_nascimento: data_nascimento,
         distrito: distrito,
+        numero_mecanografico: numero_mecanografico,
         updated_at: getDate()
     },{
         where: {id_perfil: id}
