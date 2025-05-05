@@ -1,4 +1,6 @@
 var Perfis = require('../models/Perfis')
+var Calendario = require('../models/Calendario')
+var Utilizadores = require('../models/Utilizadores')
 const controller = {};
 
 function getDate(){
@@ -12,35 +14,56 @@ function getDate(){
     return today;
 }
 
-controller.perfisCreate = async function (req, res){
-    const { id_departamento, id_utilizador, nome, email, morada, telemovel, data_nascimento, distrito } = req.body;
-    const data = await Perfis.create({
-        id_departamento: id_departamento,
-        id_utilizador: id_utilizador,
-        nome: nome,
-        email: email,
-        morada: morada,
-        telemovel: telemovel,
-        data_nascimento: data_nascimento,
-        distrito: distrito,
-        created_at: getDate(),
-        updated_at: getDate()
-    })
-    .then(function(data){
+controller.perfisCreate = async function (req, res) {
+    const { id_departamento, id_utilizador, nome, email, morada, telemovel, data_nascimento, distrito, numero_mecanografico } = req.body;
+    
+    try {
+        // Create Perfil
+        const perfil = await Perfis.create({
+            id_departamento: id_departamento,
+            id_utilizador: id_utilizador,
+            nome: nome,
+            email: email,
+            morada: morada,
+            telemovel: telemovel,
+            data_nascimento: data_nascimento,
+            distrito: distrito,
+            numero_mecanografico: numero_mecanografico,
+            created_at: getDate(),
+            updated_at: getDate(),
+        });
+
+        await Utilizadores.update({
+            id_tipo: 3
+        },{
+            where: { id_utilizador: id_utilizador}
+        })
+
+        const calendario = await Calendario.create({
+            id_perfil: perfil.id_perfil,
+            data: getDate(),
+            descricao: `Calendário do perfil: ${perfil.nome}`,
+            dias_ferias_ano_atual: 22,
+            dias_ferias_ano_anterior: 0
+        });
+
         res.status(200).json({
             success: true,
-            message: "Perfil criado",
-            data: data
-        })
-    })
-    .catch(error =>
+            message: "Perfil e Calendário criados com sucesso",
+            data: {
+                perfil: perfil,
+                calendario: calendario
+            }
+        });
+    } catch (error) {
+        console.log(error)
         res.status(500).json({
             success: false,
-            message: "Erro a criar o Perfil",
+            message: "Erro ao criar o Perfil ou Calendário",
             error: error.message
-        })
-    )
-}
+        });
+    }
+};
 
 controller.perfisList = async function (req, res){
     const data = await Perfis.findAll({order: ['nome']})
