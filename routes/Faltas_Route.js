@@ -18,6 +18,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/create', upload.single('justificacao'), controller.faltasCreate);
+router.post('/createMany', controller.createManyFaltas);
 router.get('/list', controller.faltasList);
 router.get('/listUser/:id', controller.faltasListUser); //Lista todas as faltas dadas por um utilizador
 router.get('/listTipo/:id', controller.faltasListTipo); //Lista todas as faltas dadas com um certo tipo de falta atribuido

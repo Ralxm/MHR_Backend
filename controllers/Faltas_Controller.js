@@ -1,6 +1,7 @@
 const Faltas = require('../models/Faltas');
 var sequelize = require('../models/database');
 const Perfis = require('../models/Perfis');
+const Tipo_Faltas = require('../models/Tipo_Faltas');
 
 const controller = {};
 
@@ -50,6 +51,45 @@ controller.faltasCreate = async function (req, res){
     )
 }
 
+controller.createManyFaltas = async function (req, res) {
+    const faltasArray = req.body;
+    
+    if (!Array.isArray(faltasArray)) {
+        return res.status(400).json({
+            success: false,
+            message: "O corpo do request deve ser um array de faltas"
+        });
+    }
+
+    try {
+        const faltasWithTimestamps = faltasArray.map(falta => ({
+            ...falta,
+            created_at: getDate(),
+            updated_at: getDate(),
+            estado: falta.estado || "Pendente",
+            comentarios: falta.comentarios || null,
+            motivo: falta.motivo || null,
+            id_calendario: falta.id_calendario || null,
+            justificacao: null
+        }));
+
+        const createdFaltas = await Faltas.bulkCreate(faltasWithTimestamps);
+
+        res.status(200).json({
+            success: true,
+            message: 'Faltas criadas com sucesso',
+            data: createdFaltas
+        });
+    } catch (error) {
+        console.error("Error creating multiple faltas:", error);
+        res.status(500).json({
+            success: false,
+            message: "Erro ao criar múltiplas faltas",
+            error: error.message
+        });
+    }
+};
+
 controller.faltasList = async function (req, res){
     try {
         const data = await Faltas.findAll({
@@ -62,6 +102,11 @@ controller.faltasList = async function (req, res){
                 {
                     model: Perfis,
                     as: 'validadorPerfil',
+                    required: false
+                },
+                {
+                    model: Tipo_Faltas,
+                    as: 'tipo_falta',
                     required: false
                 },
             ],
@@ -102,6 +147,11 @@ controller.faltasListUser = async function (req, res){
                 {
                     model: Perfis,
                     as: 'validadorPerfil',
+                    required: false
+                },
+                {
+                    model: Tipo_Faltas,
+                    as: 'tipo_falta',
                     required: false
                 },
             ],
@@ -145,6 +195,11 @@ controller.faltasListTipo = async function (req, res){
                     as: 'validadorPerfil',
                     required: false
                 },
+                {
+                    model: Tipo_Faltas,
+                    as: 'tipo_falta',
+                    required: false
+                },
             ],
             order: ['data_falta'],
             where: {id_tipofalta: id}
@@ -184,6 +239,11 @@ controller.faltasListAprovadasManager = async function (req, res){
                 {
                     model: Perfis,
                     as: 'validadorPerfil',
+                    required: false
+                },
+                {
+                    model: Tipo_Faltas,
+                    as: 'tipo_falta',
                     required: false
                 },
             ],
@@ -227,6 +287,11 @@ controller.faltasListRejeitadasManager = async function (req, res){
                     as: 'validadorPerfil',
                     required: false
                 },
+                {
+                    model: Tipo_Faltas,
+                    as: 'tipo_falta',
+                    required: false
+                },
             ],
             order: ['data_falta'],
             where: {validador: id, estado: "Rejeitada"}
@@ -265,6 +330,11 @@ controller.faltasListAprovadas = async function (req, res){
                 {
                     model: Perfis,
                     as: 'validadorPerfil',
+                    required: false
+                },
+                {
+                    model: Tipo_Faltas,
+                    as: 'tipo_falta',
                     required: false
                 },
             ],
@@ -307,6 +377,11 @@ controller.faltasListRejeitadas = async function (req, res){
                     as: 'validadorPerfil',
                     required: false
                 },
+                {
+                    model: Tipo_Faltas,
+                    as: 'tipo_falta',
+                    required: false
+                },
             ],
             order: ['data_falta'],
             where: {estado: "Rejeitadas"}
@@ -345,6 +420,11 @@ controller.faltasListAnalise = async function (req, res){
                 {
                     model: Perfis,
                     as: 'validadorPerfil',
+                    required: false
+                },
+                {
+                    model: Tipo_Faltas,
+                    as: 'tipo_falta',
                     required: false
                 },
             ],
@@ -387,6 +467,11 @@ controller.faltasGet = async function (req, res){
                 {
                     model: Perfis,
                     as: 'validadorPerfil',
+                    required: false
+                },
+                {
+                    model: Tipo_Faltas,
+                    as: 'tipo_falta',
                     required: false
                 },
             ],

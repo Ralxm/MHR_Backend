@@ -62,6 +62,11 @@ Faltas.belongsTo(Perfis, {
     as: "validadorPerfil"
 });
 
+Faltas.belongsTo(Tipo_Faltas, {
+    foreignKey: 'id_tipofalta',
+    as: "tipo_falta"
+});
+
 
 /*Faltas.afterCreate((faltas, options) => {
     return AuditLog.create({
