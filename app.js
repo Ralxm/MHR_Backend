@@ -19,6 +19,7 @@ const Departamento = require('./routes/Departamento_Route')
 const Despesas = require('./routes/Despesas_Route')
 const Empresa = require('./routes/Empresa_Route')
 const Faltas = require('./routes/Faltas_Route')
+const Feriados = require('./routes/Feriados_Route')
 const Ferias = require('./routes/Ferias_Route')
 const Ideia = require('./routes/Ideia_Route')
 const Linha_Temporal = require('./routes/Linha_Temporal_Route')
@@ -42,6 +43,7 @@ const _Departamento = require('./models/Departamento')
 const _Despesas = require('./models/Despesas')
 const _Empresas = require('./models/Empresa')
 const _Faltas = require('./models/Faltas')
+const _Feriados = require('./models/Feriados')
 const _Ferias = require('./models/Ferias')
 const _Ideia = require('./models/Ideia')
 const _Linha_Temporal = require('./models/Linha_Temporal')
@@ -76,6 +78,7 @@ async function syncDatabase() {
     console.log('Conexão com sucesso');
 
     await _AuditLog.sync();
+    await _Feriados.sync();
     await _Tipo_Utilizador.sync();
     await _Departamento.sync();
     await _Perfis.sync();
@@ -308,6 +311,7 @@ app.use('/departamento', middleware.checkToken, Departamento)
 app.use('/despesas', middleware.checkToken, Despesas)
 app.use('/empresa', middleware.checkToken, Empresa)
 app.use('/faltas', middleware.checkToken, Faltas)
+app.use('/feriados', middleware.checkToken, Feriados)
 app.use('/ferias', middleware.checkToken,  Ferias)
 app.use('/ideia', middleware.checkToken, Ideia)
 app.use('/linha_temporal', middleware.checkToken, Linha_Temporal)
