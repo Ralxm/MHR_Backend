@@ -71,10 +71,11 @@ controller.feriadoDelete = async (req, res) => {
 
 controller.feriadoUpdate = async (req, res) => {
     const { id } = req.params
-    const { nome, data_feriado } = req.body;
+    const { nome, data_feriado, tipo } = req.body;
     const data = await Feriados.update({
         nome: nome,
         data_feriado : data_feriado,
+        tipo: tipo
     }, {
         where: { id_feriado: id }
     })

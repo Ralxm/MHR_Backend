@@ -5,6 +5,7 @@ const config = require('../config');
 const Utilizadores = require('../models/Utilizadores')
 const Vaga = require('../models/Vaga')
 const Perfis = require('../models/Perfis')
+const Comentarios = require('../models/Comentarios')
 
 const controller = {};
 
@@ -258,22 +259,45 @@ controller.candidaturasGet = async function (req, res) {
 
 controller.candidaturasDelete = async function (req, res) {
     const { id } = req.params;
-    const data = await Candidaturas.destroy({
+    try{
+        await Comentarios.destroy({
+            where: {id_candidatura: id}
+        })
+
+        await Candidaturas.destroy({
+            where: { id_candidatura: id }
+        })
+
+        res.status(200).json({
+            success: true,
+            message: "Candidatura apagada com sucesso!"
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar a candidatura",
+            error: error.message
+        });
+    }
+
+    /*const data = await Candidaturas.destroy({
         where: { id_candidatura: id }
     })
         .then(function () {
             res.status(200).json({
                 success: true,
-                message: "Candidatura apagada"
+                message: "Candidatura apagada com sucesso!"
             })
         })
         .catch(error => {
+            console.log(error)
             res.status(500).json({
                 success: false,
                 message: "Erro a apagar a candidatura",
                 error: error.message
             });
-        })
+        })*/
 }
 
 controller.candidaturasUpdate = async function (req, res) {

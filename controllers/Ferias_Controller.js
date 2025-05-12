@@ -55,6 +55,11 @@ controller.feriasList = async function (req, res){
                 as: 'perfil',
                 required: false
             },
+            {
+                model: Perfis,
+                as: 'perfilValidador',
+                required: false
+            },
         ],
     })
     .then(function(data) {
@@ -82,6 +87,11 @@ controller.feriasListEmAnalise = async function (req, res){
                 as: 'perfil',
                 required: false
             },
+            {
+                model: Perfis,
+                as: 'perfilValidador',
+                required: false
+            },
         ],
     })
     .then(function(data) {
@@ -106,6 +116,11 @@ controller.feriasListAprovadas = async function (req, res){
             {
                 model: Perfis,
                 as: 'perfil',
+                required: false
+            },
+            {
+                model: Perfis,
+                as: 'perfilValidador',
                 required: false
             },
         ],
@@ -136,6 +151,11 @@ controller.feriasListRejeitadas = async function (req, res){
                 as: 'perfil',
                 required: false
             },
+            {
+                model: Perfis,
+                as: 'perfilValidador',
+                required: false
+            },
         ],
     })
     .then(function(data) {
@@ -164,6 +184,11 @@ controller.feriasListUser = async function (req, res){
                 as: 'perfil',
                 required: false
             },
+            {
+                model: Perfis,
+                as: 'perfilValidador',
+                required: false
+            },
         ],
     })
     .then(function(data) {
@@ -189,6 +214,11 @@ controller.feriasGet = async function (req, res){
             {
                 model: Perfis,
                 as: 'perfil',
+                required: false
+            },
+            {
+                model: Perfis,
+                as: 'perfilValidador',
                 required: false
             },
         ],

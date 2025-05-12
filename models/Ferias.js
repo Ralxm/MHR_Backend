@@ -53,6 +53,11 @@ Ferias.belongsTo(Perfis, {
     as: "perfil"
 });
 
+Ferias.belongsTo(Perfis, {
+    foreignKey: 'validador',
+    as: "perfilValidador"
+});
+
 Ferias.afterCreate((ferias, options) => {
     /*return AuditLog.create({
         utilizador: ferias.id_perfil,

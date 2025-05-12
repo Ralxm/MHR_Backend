@@ -47,10 +47,21 @@ controller.utilizadoresLogin = async function (req, res) {
                 if (user.estado == "Ativa") {
                     res.json({
                         success: true,
-                        message: 'Autenticação realizada comsucesso!',
+                        message: 'Autenticação realizada com sucesso!',
                         token: token,
                         id_utilizador: user.id_utilizador,
                         tipo: user.id_tipo,
+                        estado: user.estado,
+                        nome_utilizador: user.nome_utilizador
+                    });
+                }
+                else if(user.estado == "Restrita"){
+                    res.json({
+                        success: true,
+                        message: 'Autenticação realizada com sucesso!',
+                        token: token,
+                        id_utilizador: user.id_utilizador,
+                        tipo: 5,
                         estado: user.estado,
                         nome_utilizador: user.nome_utilizador
                     });

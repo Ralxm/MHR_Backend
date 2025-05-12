@@ -9,6 +9,7 @@ const Feriados = SequelizeDB.define('feriados', {
     },
     nome: Sequelize.CHAR(256),
     data_feriado: Sequelize.DATEONLY,
+    tipo: Sequelize.TEXT //Móvel, Fixo
 },
 {
     tableName: 'FERIADOS',

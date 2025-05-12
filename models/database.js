@@ -1,6 +1,6 @@
 const { Sequelize }= require('sequelize');
 
-const sequelize = new Sequelize(
+/*const sequelize = new Sequelize(
   'mhrs_db',
   'mhrs',
   'mhrspwd',
@@ -9,9 +9,9 @@ const sequelize = new Sequelize(
     dialect: 'postgres',
     port: 5432,
   }
-);
+);*/
 
-/*const sequelize = new Sequelize(
+const sequelize = new Sequelize(
   'MHR',
   'postgres',
   'postgres',
@@ -20,6 +20,6 @@ const sequelize = new Sequelize(
     dialect: 'postgres',
     port: 5432,
   }
-);*/
+);
 
 module.exports = sequelize;

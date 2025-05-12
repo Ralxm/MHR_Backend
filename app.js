@@ -125,17 +125,6 @@ async function initializeDatabase() {
     })
   }
 
-  //CRIA O DEPARTAMENTO INICIAL
-  let departamento;
-  const departamentoCount = await _Departamento.count();
-  if(departamentoCount == 0){
-    departamento = await _Departamento.create({
-      nome_departamento: 'Sem Nome',
-      descricao: 'Departamento Inicial',
-      responsavel_departamento: 0
-    })
-  }
-
   //CRIA O TIPO DE UTILIZADORES
   const tipoUtilizadoresCount = await _Tipo_Utilizador.count();
   let admin;
@@ -185,7 +174,6 @@ async function initializeDatabase() {
     })
 
     await _Perfis.create({
-      id_departamento: departamento.id_departamento,
       id_utilizador: utilizador.id_utilizador,
       nome: "Administrador",
       email: "admin@email.com",
