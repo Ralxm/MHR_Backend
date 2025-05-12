@@ -1,41 +1,61 @@
 var Comentarios = require('../models/Comentarios')
 var Perfis = require('../models/Perfis')
 const controller = {};
+const AuditLog = require('../models/AuditLog')
 
 function getDate() {
     let now = new Date();
+    
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
     let yyyy = now.getFullYear();
+
+    let hh = now.getHours();
+    let min = now.getMinutes();
+    let ss = now.getSeconds();
+    
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
-    let today = `${yyyy}-${mm}-${dd}`;
-    return today;
+    if (hh < 10) hh = '0' + hh;
+    if (min < 10) min = '0' + min;
+    if (ss < 10) ss = '0' + ss;
+
+    let datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    return datetime;
 }
 
 controller.comentarioCreate = async function (req, res) {
     const { id_candidatura, comentario, responsavel } = req.body;
-    const data = await Comentarios.create({
-        id_candidatura: id_candidatura,
-        comentario: comentario,
-        responsavel: responsavel,
-        created_at: getDate(),
-        updated_at: getDate()
-    })
-        .then(function (data) {
-            res.status(200).json({
-                success: true,
-                message: "Comentario Criado",
-                data: data
-            })
+
+    try {
+        const data = await Comentarios.create({
+            id_candidatura: id_candidatura,
+            comentario: comentario,
+            responsavel: responsavel,
+            created_at: getDate(),
+            updated_at: getDate()
         })
-        .catch(error =>
-            res.status(500).json({
-                success: false,
-                message: "Erro a criar o Comentario",
-                error: error.message
-            })
-        )
+
+        await AuditLog.create({
+            utilizador: responsavel,
+            data_atividade: getDate(),
+            tipo_atividade: "Criação de comentário em candidatura",
+            descricao: "Perfil com ID " + responsavel + " criou um comentário na candidatura com ID: " + id_candidatura
+        })
+
+        res.status(200).json({
+            success: true,
+            message: "Comentario Criado",
+            data: data
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro a criar o Comentario",
+            error: error.message
+        })
+    }
 }
 
 controller.comentarioList = async function (req, res) {
@@ -121,22 +141,30 @@ controller.comentarioGet = async function (req, res) {
 
 controller.comentarioDelete = async function (req, res) {
     const { id } = req.params;
-    const data = await Comentarios.destroy({
-        where: { id_comentario: id }
-    })
-        .then(function () {
-            res.status(200).json({
-                success: true,
-                message: "Comentário Apagado"
-            })
+
+    try {
+        const data = await Comentarios.destroy({
+            where: { id_comentario: id }
         })
-        .catch(error => {
-            res.status(500).json({
-                success: false,
-                message: "Erro a apagar o comentário",
-                error: error.message
-            });
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Eliminação de comentário em candidatura",
+            descricao: "Comentário em candidatura com ID: " + id + " foi apagado"
         })
+
+        res.status(200).json({
+            success: true,
+            message: "Comentário Apagado"
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar o comentário",
+            error: error.message
+        });
+    }
 }
 
 controller.comentarioUpdate = async function (req, res) {

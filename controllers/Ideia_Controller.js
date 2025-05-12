@@ -1,51 +1,70 @@
 const Ideia = require('../models/Ideia');
 var sequelize = require('../models/database');
 const Perfis = require('../models/Perfis')
+const AuditLog = require('../models/AuditLog')
 
 const controller = {};
 
-function getDate(){
+function getDate() {
     let now = new Date();
+    
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
     let yyyy = now.getFullYear();
+
+    let hh = now.getHours();
+    let min = now.getMinutes();
+    let ss = now.getSeconds();
+    
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
-    let today = `${yyyy}-${mm}-${dd}`;
-    return today;
+    if (hh < 10) hh = '0' + hh;
+    if (min < 10) min = '0' + min;
+    if (ss < 10) ss = '0' + ss;
+
+    let datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    return datetime;
 }
 
-controller.ideiaCreate = async function (req, res){
-    const { id_perfil, titulo_ideia, descricao, estado} = req.body;
+controller.ideiaCreate = async function (req, res) {
+    const { id_perfil, titulo_ideia, descricao, estado } = req.body;
     const ficheiro_complementar = req.file ? req.file.path : null;
 
-    const data = await Ideia.create({
-        id_perfil: id_perfil,
-        titulo_ideia: titulo_ideia,
-        descricao: descricao,
-        estado: estado,
-        ficheiro_complementar: ficheiro_complementar,
-        validador: null,
-        created_at: getDate(),
-        updated_at: getDate()
-    })
-    .then(function(data){
+    try {
+        const data = await Ideia.create({
+            id_perfil: id_perfil,
+            titulo_ideia: titulo_ideia,
+            descricao: descricao,
+            estado: estado,
+            ficheiro_complementar: ficheiro_complementar,
+            validador: null,
+            created_at: getDate(),
+            updated_at: getDate()
+        })
+
+        await AuditLog.create({
+            utilizador: id_perfil,
+            data_atividade: getDate(),
+            tipo_atividade: "Criação de ideia",
+            descricao: "Perfil com ID " + id_perfil + " criou uma ideia com o título: " + titulo_ideia
+        })
+
         res.status(200).json({
             success: true,
             message: "Ideia criada",
             data: data
         })
-    })
-    .catch(error =>
+    }
+    catch (error) {
         res.status(500).json({
             success: false,
             message: "Erro a criar a ideia",
             error: error.message
         })
-    )
+    }
 }
 
-controller.ideiaList = async function (req, res){
+controller.ideiaList = async function (req, res) {
     try {
         const data = await Ideia.findAll({
             order: ['titulo_ideia'],
@@ -84,7 +103,7 @@ controller.ideiaList = async function (req, res){
     }
 }
 
-controller.ideiaList_EmAnalise = async function (req, res){
+controller.ideiaList_EmAnalise = async function (req, res) {
     try {
         const data = await Ideia.findAll({
             order: ['titulo_ideia'],
@@ -100,7 +119,7 @@ controller.ideiaList_EmAnalise = async function (req, res){
                     required: false
                 },
             ],
-            where: {estado: "Em análise"}
+            where: { estado: "Em análise" }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -124,7 +143,7 @@ controller.ideiaList_EmAnalise = async function (req, res){
     }
 }
 
-controller.ideiaList_Aprovada = async function (req, res){
+controller.ideiaList_Aprovada = async function (req, res) {
     const data = await Ideia.findAll({
         order: ['titulo_projeto'],
         include: [
@@ -139,24 +158,24 @@ controller.ideiaList_Aprovada = async function (req, res){
                 required: false
             },
         ],
-        where: {estado: "Aprovada"},
+        where: { estado: "Aprovada" },
     })
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar os Projetos",
+                error: error.message
+            });
         });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar os Projetos",
-            error: error.message
-        });
-    });
 }
 
-controller.ideiaList_Rejeitada = async function (req, res){
+controller.ideiaList_Rejeitada = async function (req, res) {
     try {
         const data = await Ideia.findAll({
             order: ['titulo_ideia'],
@@ -172,7 +191,7 @@ controller.ideiaList_Rejeitada = async function (req, res){
                     required: false
                 },
             ],
-            where: {estado: "Rejeitada"}
+            where: { estado: "Rejeitada" }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -196,7 +215,7 @@ controller.ideiaList_Rejeitada = async function (req, res){
     }
 }
 
-controller.ideiaListUser = async function (req, res){
+controller.ideiaListUser = async function (req, res) {
     const { id } = req.params;
     try {
         const data = await Ideia.findAll({
@@ -213,7 +232,7 @@ controller.ideiaListUser = async function (req, res){
                     required: false
                 },
             ],
-            where: {id_perfil: id}
+            where: { id_perfil: id }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -237,7 +256,7 @@ controller.ideiaListUser = async function (req, res){
     }
 }
 
-controller.ideiaGet = async function (req, res){
+controller.ideiaGet = async function (req, res) {
     const { id } = req.params;
 
     try {
@@ -278,27 +297,35 @@ controller.ideiaGet = async function (req, res){
     }
 }
 
-controller.ideiaDelete = async function (req, res){
+controller.ideiaDelete = async function (req, res) {
     const { id } = req.params;
-    const data = await Ideia.destroy({
-        where: {id_ideia: id}
-    })
-    .then(function() {
+
+    try {
+        const data = await Ideia.destroy({
+            where: { id_ideia: id }
+        })
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Eliminação de ideia",
+            descricao: "Ideia com ID: " + id + " foi apagada"
+        })
+
         res.status(200).json({
             success: true,
             message: "Ideia apagada com sucesso"
         })
-    })
-    .catch(error => {
+    }
+    catch (error) {
         res.status(500).json({
             success: false,
             message: "Erro a apagar o Projeto",
             error: error.message
         });
-    })
+    }
 }
 
-controller.ideiaUpdate = async function (req, res){
+controller.ideiaUpdate = async function (req, res) {
     const { id } = req.params;
     const { titulo_ideia, descricao, estado, validador } = req.body;
 
@@ -339,6 +366,12 @@ controller.ideiaUpdate = async function (req, res){
             where: { id_ideia: id }
         });
 
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Edição de ideia",
+            descricao: "Ideia com ID: " + id + " foi alterada."
+        })
+
         res.status(200).json({
             success: true,
             message: "Ideia atualizada com sucesso"
@@ -353,7 +386,7 @@ controller.ideiaUpdate = async function (req, res){
     }
 }
 
-controller.aceitarIdeia = async function (req, res){
+controller.aceitarIdeia = async function (req, res) {
     const { id } = req.params;
     const { id_perfil } = req.body;
 
@@ -393,7 +426,7 @@ controller.aceitarIdeia = async function (req, res){
     }
 }
 
-controller.rejeitarIdeia = async function (req, res){
+controller.rejeitarIdeia = async function (req, res) {
     const { id } = req.params;
     const { id_perfil } = req.body;
 

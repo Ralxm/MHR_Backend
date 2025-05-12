@@ -1,52 +1,70 @@
 const Ferias = require('../models/Ferias');
 var sequelize = require('../models/database');
 const Perfis = require('../models/Perfis');
+const AuditLog = require('../models/AuditLog')
 
 const controller = {};
 
-function getDate(){
+function getDate() {
     let now = new Date();
+    
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
     let yyyy = now.getFullYear();
+
+    let hh = now.getHours();
+    let min = now.getMinutes();
+    let ss = now.getSeconds();
+    
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
-    let today = `${yyyy}-${mm}-${dd}`;
-    return today;
+    if (hh < 10) hh = '0' + hh;
+    if (min < 10) min = '0' + min;
+    if (ss < 10) ss = '0' + ss;
+
+    let datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    return datetime;
 }
 
-controller.feriasCreate = async function (req, res){
+controller.feriasCreate = async function (req, res) {
     const { id_perfil, id_calendario, data_inicio, data_conclusao, duracao } = req.body;
-    const data = await Ferias.create({
-        id_perfil: id_perfil,
-        id_calendario: id_calendario,
-        data_inicio: data_inicio,
-        data_conclusao: data_conclusao,
-        data_pedido: getDate(),
-        duracao: duracao,
-        estado: "Pendente",
-        created_at: getDate(),
-        updated_at: getDate()
-    })
-    .then(function(data){
+
+    try {
+        const data = await Ferias.create({
+            id_perfil: id_perfil,
+            id_calendario: id_calendario,
+            data_inicio: data_inicio,
+            data_conclusao: data_conclusao,
+            data_pedido: getDate(),
+            duracao: duracao,
+            estado: "Pendente",
+            created_at: getDate(),
+            updated_at: getDate()
+        })
+
+        await AuditLog.create({
+            utilizador: id_perfil,
+            data_atividade: getDate(),
+            tipo_atividade: "Criação de férias",
+            descricao: "Perfil com ID " + id_perfil + " criou um pedido de férias entre as datas: " + data_inicio + " - " + data_conclusao
+        })
+
         res.status(200).json({
             success: true,
             message: "Férias criadas com sucesso",
             data: data
         })
-    })
-    .catch(error =>{
-        console.log(error)
+    }
+    catch (error) {
         res.status(500).json({
             success: false,
             message: "Erro a criar as férias",
             error: error.message
         })
     }
-    )
 }
 
-controller.feriasList = async function (req, res){
+controller.feriasList = async function (req, res) {
     const data = await Ferias.findAll({
         order: ['data_inicio'],
         include: [
@@ -62,25 +80,25 @@ controller.feriasList = async function (req, res){
             },
         ],
     })
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar as férias",
+                error: error.message
+            });
         });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar as férias",
-            error: error.message
-        });
-    });
 }
 
-controller.feriasListEmAnalise = async function (req, res){
+controller.feriasListEmAnalise = async function (req, res) {
     const data = await Ferias.findAll({
         order: ['data_inicio'],
-        where: {estado: "Em análise"},
+        where: { estado: "Em análise" },
         include: [
             {
                 model: Perfis,
@@ -94,22 +112,22 @@ controller.feriasListEmAnalise = async function (req, res){
             },
         ],
     })
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar as férias",
+                error: error.message
+            });
         });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar as férias",
-            error: error.message
-        });
-    });
 }
 
-controller.feriasListAprovadas = async function (req, res){
+controller.feriasListAprovadas = async function (req, res) {
     const data = await Ferias.findAll({
         order: ['data_inicio'],
         include: [
@@ -124,27 +142,27 @@ controller.feriasListAprovadas = async function (req, res){
                 required: false
             },
         ],
-        where: {estado: "Aprovada"}
+        where: { estado: "Aprovada" }
     })
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar as férias",
+                error: error.message
+            });
         });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar as férias",
-            error: error.message
-        });
-    });
 }
 
-controller.feriasListRejeitadas = async function (req, res){
+controller.feriasListRejeitadas = async function (req, res) {
     const data = await Ferias.findAll({
         order: ['data_inicio'],
-        where: {estado: "Rejeitada"},
+        where: { estado: "Rejeitada" },
         include: [
             {
                 model: Perfis,
@@ -158,26 +176,26 @@ controller.feriasListRejeitadas = async function (req, res){
             },
         ],
     })
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar as férias",
+                error: error.message
+            });
         });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar as férias",
-            error: error.message
-        });
-    });
 }
 
-controller.feriasListUser = async function (req, res){
+controller.feriasListUser = async function (req, res) {
     const { id } = req.params
     const data = await Ferias.findAll({
         order: ['data_inicio'],
-        where: {id_perfil: id},
+        where: { id_perfil: id },
         include: [
             {
                 model: Perfis,
@@ -191,22 +209,22 @@ controller.feriasListUser = async function (req, res){
             },
         ],
     })
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a listar as férias",
+                error: error.message
+            });
         });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a listar as férias",
-            error: error.message
-        });
-    });
 }
 
-controller.feriasGet = async function (req, res){
+controller.feriasGet = async function (req, res) {
     const { id } = req.params;
     const data = await Ferias.findAll({
         where: { id_solicitacao: id },
@@ -223,69 +241,84 @@ controller.feriasGet = async function (req, res){
             },
         ],
     })
-    .then(function(data) {
-        res.status(200).json({
-            success: true,
-            data: data
-        });
-    })
-    .catch(error => {
-        res.status(500).json({
-            success: false,
-            message: "Erro a encontrar as ferias",
-            error: error
-        });
-    })
+        .then(function (data) {
+            res.status(200).json({
+                success: true,
+                data: data
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                success: false,
+                message: "Erro a encontrar as ferias",
+                error: error
+            });
+        })
 }
 
-controller.feriasDelete = async function (req, res){
+controller.feriasDelete = async function (req, res) {
     const { id } = req.params;
-    const data = await Ferias.destroy({
-        where: {id_solicitacao: id}
-    })
-    .then(function() {
+
+    try {
+        const data = await Ferias.destroy({
+            where: { id_solicitacao: id }
+        })
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Eliminação de férias",
+            descricao: "Foi apagado um pedido de férias com o ID: " + id
+        })
+
         res.status(200).json({
             success: true,
             message: "Férias apagado"
         })
-    })
-    .catch(error => {
+    }
+    catch (error) {
         res.status(500).json({
             success: false,
             message: "Erro a apagar as férias",
             error: error.message
         });
-    })
+    }
 }
 
-controller.feriasUpdate = async function (req, res){
+controller.feriasUpdate = async function (req, res) {
     const { id } = req.params;
     const { data_inicio, data_conclusao, duracao, estado, validador, comentarios } = req.body;
 
-    const data = await Ferias.update({
-        data_inicio: data_inicio,
-        data_conclusao: data_conclusao,
-        duracao: duracao,
-        estado: estado,
-        validador: validador == "null" ? null : validador,
-        comentarios: comentarios == "null" ? null : comentarios,
-        updated_at: getDate()
-    },{
-        where: {id_solicitacao: id}
-    })
-    .then(function() {
+    try {
+        const data = await Ferias.update({
+            data_inicio: data_inicio,
+            data_conclusao: data_conclusao,
+            duracao: duracao,
+            estado: estado,
+            validador: validador == "null" ? null : validador,
+            comentarios: comentarios == "null" ? null : comentarios,
+            updated_at: getDate()
+        }, {
+            where: { id_solicitacao: id }
+        })
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Edição de férias",
+            descricao: "O pedido de férias com ID: " + id + "foi alterado"
+        })
+
         res.status(200).json({
             success: true,
             message: "Férias alteradas com sucesso"
         })
-    })
-    .catch(error => {
+    }
+    catch (error) {
         res.status(500).json({
             success: false,
             message: "Erro a apagar as férias",
             error: error.message
         });
-    })
+    }
 }
 
 /*controllers.ferias_lista_  = async (req, res) => {

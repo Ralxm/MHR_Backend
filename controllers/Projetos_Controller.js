@@ -1,49 +1,66 @@
 const Projetos = require('../models/Projetos');
 var sequelize = require('../models/database');
 const controller = {};
+const AuditLog = require('../models/AuditLog')
 
 function getDate() {
     let now = new Date();
+    
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
     let yyyy = now.getFullYear();
+
+    let hh = now.getHours();
+    let min = now.getMinutes();
+    let ss = now.getSeconds();
+    
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
-    let today = `${yyyy}-${mm}-${dd}`;
-    return today;
+    if (hh < 10) hh = '0' + hh;
+    if (min < 10) min = '0' + min;
+    if (ss < 10) ss = '0' + ss;
+
+    let datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    return datetime;
 }
 
 controller.projetoCreate = async function (req, res) {
     const { id_ideia, titulo_projeto, estado, descricao, requisitos, futuras_melhorias, data_inicio, data_final_prevista } = req.body;
-    const data = await Projetos.create({
-        id_ideia: id_ideia,
-        titulo_projeto: titulo_projeto,
-        estado: estado,
-        data_atribuicao: getDate(),
-        descricao: descricao,
-        requisitos: requisitos,
-        futuras_melhorias: futuras_melhorias,
-        data_inicio: data_inicio,
-        data_final_prevista: data_final_prevista,
-        created_at: getDate(),
-        updated_at: getDate()
-    })
-        .then(function (data) {
-            res.status(200).json({
-                success: true,
-                message: "Projeto criado",
-                data: data
-            })
+
+    try {
+        const data = await Projetos.create({
+            id_ideia: id_ideia,
+            titulo_projeto: titulo_projeto,
+            estado: estado,
+            data_atribuicao: getDate(),
+            descricao: descricao,
+            requisitos: requisitos,
+            futuras_melhorias: futuras_melhorias,
+            data_inicio: data_inicio,
+            data_final_prevista: data_final_prevista,
+            created_at: getDate(),
+            updated_at: getDate()
         })
-        .catch(error => {
-            console.log(error)
-            res.status(500).json({
-                success: false,
-                message: "Erro a criar o Projeto",
-                error: error.message
-            })
-        }
-    )
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Criação de projeto",
+            descricao: "Foi criado um projeto com o título: " + titulo_projeto
+        })
+
+        res.status(200).json({
+            success: true,
+            message: "Projeto criado",
+            data: data
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro a criar o Projeto",
+            error: error.message
+        })
+    }
 }
 
 controller.projetoList = async function (req, res) {
@@ -148,53 +165,70 @@ controller.projetoGet = async function (req, res) {
 
 controller.projetoDelete = async function (req, res) {
     const { id } = req.params;
-    const data = await Projetos.destroy({
-        where: { id_projeto: id }
-    })
-        .then(function () {
-            res.status(200).json({
-                success: true,
-                message: "Projeto apagado com sucesso"
-            })
+
+    try {
+        const data = await Projetos.destroy({
+            where: { id_projeto: id }
         })
-        .catch(error => {
-            res.status(500).json({
-                success: false,
-                message: "Erro a apagar o Projeto",
-                error: error.message
-            });
+
+        await AuditLog.create({
+            utilizador: id_perfil,
+            data_atividade: getDate(),
+            tipo_atividade: "Eliminação de projeto",
+            descricao: "Projeto com o ID: " + id + " foi apagado"
         })
+
+        res.status(200).json({
+            success: true,
+            message: "Projeto apagado com sucesso"
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar o Projeto",
+            error: error.message
+        });
+    }
 }
 
 controller.projetoUpdate = async function (req, res) {
     const { id } = req.params;
     const { id_projeto, titulo_projeto, estado, descricao, requisitos, futuras_melhorias, data_inicio, data_final_prevista } = req.body;
-    const data = await Projetos.update({
-        id_projeto: id_projeto,
-        titulo_projeto: titulo_projeto,
-        estado: estado,
-        descricao: descricao,
-        requisitos: requisitos,
-        futuras_melhorias: futuras_melhorias,
-        data_inicio: data_inicio,
-        data_final_prevista: data_final_prevista,
-        updated_at: getDate()
-    }, {
-        where: { id_projeto: id }
-    })
-        .then(function () {
-            res.status(200).json({
-                success: true,
-                message: "Projeto atualizado com sucesso"
-            })
+
+    try {
+        const data = await Projetos.update({
+            id_projeto: id_projeto,
+            titulo_projeto: titulo_projeto,
+            estado: estado,
+            descricao: descricao,
+            requisitos: requisitos,
+            futuras_melhorias: futuras_melhorias,
+            data_inicio: data_inicio,
+            data_final_prevista: data_final_prevista,
+            updated_at: getDate()
+        }, {
+            where: { id_projeto: id }
         })
-        .catch(error => {
-            res.status(500).json({
-                success: false,
-                message: "Erro a atualizar o Projeto",
-                error: error.message
-            });
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Edição de projeto",
+            descricao: "Projeto com ID: " + id + " foi editado"
         })
+
+        res.status(200).json({
+            success: true,
+            message: "Projeto atualizado com sucesso"
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro a atualizar o Projeto",
+            error: error.message
+        });
+    }
 }
 
 

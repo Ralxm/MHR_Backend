@@ -4,20 +4,30 @@ const nodemailer = require('nodemailer');
 const config = require('../config');
 const Utilizadores = require('../models/Utilizadores')
 const Vaga = require('../models/Vaga')
-const Perfis = require('../models/Perfis')
 const Comentarios = require('../models/Comentarios')
+const AuditLog = require('../models/AuditLog')
 
 const controller = {};
 
 function getDate() {
     let now = new Date();
+    
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
     let yyyy = now.getFullYear();
+
+    let hh = now.getHours();
+    let min = now.getMinutes();
+    let ss = now.getSeconds();
+    
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
-    let today = `${yyyy}-${mm}-${dd}`;
-    return today;
+    if (hh < 10) hh = '0' + hh;
+    if (min < 10) min = '0' + min;
+    if (ss < 10) ss = '0' + ss;
+
+    let datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    return datetime;
 }
 
 controller.candidaturasCreate = async function (req, res) {
@@ -25,33 +35,41 @@ controller.candidaturasCreate = async function (req, res) {
 
     const curriculo = req.file ? req.file.path : null;
 
-    const data = await Candidaturas.create({
-        id_vaga: id_vaga,
-        id_utilizador: id_utilizador,
-        data_submissao: getDate(),
-        curriculo: curriculo,
-        telemovel: telemovel,
-        email: email,
-        status: status,
-        responsavel: 1,
-        resultado: "Em análise",
-        created_at: getDate(),
-        updated_at: getDate()
-    })
-        .then(function (data) {
-            res.status(200).json({
-                success: true,
-                message: "Candidatura criada",
-                data: data
-            })
+    try {
+        const data = await Candidaturas.create({
+            id_vaga: id_vaga,
+            id_utilizador: id_utilizador,
+            data_submissao: getDate(),
+            curriculo: curriculo,
+            telemovel: telemovel,
+            email: email,
+            status: status,
+            responsavel: 1,
+            resultado: "Em análise",
+            created_at: getDate(),
+            updated_at: getDate()
         })
-        .catch(error =>
-            res.status(500).json({
-                success: false,
-                message: "Erro a criar a candidatura",
-                error: error.message
-            })
-        )
+
+        await AuditLog.create({
+            utilizador: id_utilizador,
+            data_atividade: getDate(),
+            tipo_atividade: "Criação de candidatura",
+            descricao: "Utilizador com ID " + id_utilizador + " criou uma candidatura na vaga com ID: " + id_vaga
+        })
+
+        res.status(200).json({
+            success: true,
+            message: "Candidatura criada",
+            data: data
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro a criar a candidatura",
+            error: error.message
+        })
+    }
 }
 
 controller.candidaturasList = async function (req, res) {
@@ -259,13 +277,19 @@ controller.candidaturasGet = async function (req, res) {
 
 controller.candidaturasDelete = async function (req, res) {
     const { id } = req.params;
-    try{
+    try {
         await Comentarios.destroy({
-            where: {id_candidatura: id}
+            where: { id_candidatura: id }
         })
 
         await Candidaturas.destroy({
             where: { id_candidatura: id }
+        })
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Eliminação de candidatura",
+            descricao: "A candidatura com ID " + id + " e todos os seus comentários foram apagados"
         })
 
         res.status(200).json({
@@ -336,6 +360,12 @@ controller.candidaturasUpdate = async function (req, res) {
         }, {
             where: { id_candidatura: id }
         });
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Edição de candidatura",
+            descricao: "A candidatura com ID: " + id + " foi editada"
+        })
 
         res.status(200).json({
             success: true,

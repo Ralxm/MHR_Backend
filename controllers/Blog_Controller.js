@@ -2,6 +2,7 @@ const Blog = require('../models/Blog');
 const Perfis = require('../models/Perfis');
 const multer = require('multer');
 var sequelize = require('../models/database');
+const AuditLog = require('../models/AuditLog')
 
 const controller = {};
 
@@ -10,13 +11,23 @@ const upload = multer({ storage: storage }).single('imagem');
 
 function getDate() {
     let now = new Date();
+    
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
     let yyyy = now.getFullYear();
+
+    let hh = now.getHours();
+    let min = now.getMinutes();
+    let ss = now.getSeconds();
+    
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
-    let today = `${yyyy}-${mm}-${dd}`;
-    return today;
+    if (hh < 10) hh = '0' + hh;
+    if (min < 10) min = '0' + min;
+    if (ss < 10) ss = '0' + ss;
+
+    let datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    return datetime;
 }
 
 controller.blogCreate = async function (req, res) {
@@ -40,6 +51,13 @@ controller.blogCreate = async function (req, res) {
             updated_at: getDate(),
             imagem: imagem,
             views: 0
+        })
+
+        await AuditLog.create({
+            utilizador: id_perfil,
+            data_atividade: getDate(),
+            tipo_atividade: "Criação de publicação",
+            descricao: "Perfil com ID " + id_perfil + " criou uma publicação no blog"
         })
 
         res.status(200).json({
@@ -252,22 +270,30 @@ controller.blogGet = async function (req, res) {
 
 controller.blogDelete = async function (req, res) {
     const { id } = req.params;
-    const data = await Blog.destroy({
-        where: { id_publicacao: id }
-    })
-        .then(function () {
-            res.status(200).json({
-                success: true,
-                message: "Publicação apagada com sucesso"
-            })
+
+    try {
+        const data = await Blog.destroy({
+            where: { id_publicacao: id }
         })
-        .catch(error => {
-            res.status(500).json({
-                success: false,
-                message: "Erro a apagar a publicação",
-                error: error.message
-            });
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Eliminação de publicação",
+            descricao: "Publicação com ID " + id + " foi apagada"
         })
+
+        res.status(200).json({
+            success: true,
+            message: "Publicação apagada com sucesso"
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar a publicação",
+            error: error.message
+        });
+    }
 }
 
 controller.blogUpdate = async function (req, res) {
@@ -316,6 +342,12 @@ controller.blogUpdate = async function (req, res) {
             }, {
                 where: { id_publicacao: id }
             });
+
+            await AuditLog.create({
+                data_atividade: getDate(),
+                tipo_atividade: "Edição de publicação",
+                descricao: "Publicação com ID " + id + " foi alterada"
+            })
 
             res.status(200).json({
                 success: true,
@@ -388,7 +420,7 @@ controller.blogRejeitar = async function (req, res) {
 
 controller.blogVer = async function (req, res) {
     const { id } = req.params;
-    
+
     try {
         const blog = await Blog.findOne({
             where: { id_publicacao: id }

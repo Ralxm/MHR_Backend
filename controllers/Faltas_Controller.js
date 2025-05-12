@@ -2,58 +2,75 @@ const Faltas = require('../models/Faltas');
 var sequelize = require('../models/database');
 const Perfis = require('../models/Perfis');
 const Tipo_Faltas = require('../models/Tipo_Faltas');
+const AuditLog = require('../models/AuditLog')
 
 const controller = {};
 
-function getDate(){
+function getDate() {
     let now = new Date();
+    
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
     let yyyy = now.getFullYear();
+
+    let hh = now.getHours();
+    let min = now.getMinutes();
+    let ss = now.getSeconds();
+    
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
-    let today = `${yyyy}-${mm}-${dd}`;
-    return today;
+    if (hh < 10) hh = '0' + hh;
+    if (min < 10) min = '0' + min;
+    if (ss < 10) ss = '0' + ss;
+
+    let datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    return datetime;
 }
 
-controller.faltasCreate = async function (req, res){
-    const { id_tipofalta, id_perfil, id_calendario, data_falta, comentarios, estado, motivo} = req.body;
+controller.faltasCreate = async function (req, res) {
+    const { id_tipofalta, id_perfil, id_calendario, data_falta, comentarios, estado, motivo } = req.body;
 
     const justificacao = req.file ? req.file.path : null;
 
-    const data = await Faltas.create({
-        id_tipofalta: id_tipofalta,
-        id_perfil: id_perfil,
-        id_calendario: id_calendario,
-        data_falta: data_falta,
-        motivo: motivo,
-        justificacao: justificacao,
-        estado: estado,
-        comentarios: comentarios,
-        created_at: getDate(),
-        updated_at: getDate()
-    })
-    .then(function(data){
+    try {
+        const data = await Faltas.create({
+            id_tipofalta: id_tipofalta,
+            id_perfil: id_perfil,
+            id_calendario: id_calendario,
+            data_falta: data_falta,
+            motivo: motivo,
+            justificacao: justificacao,
+            estado: estado,
+            comentarios: comentarios,
+            created_at: getDate(),
+            updated_at: getDate()
+        })
+
+        await AuditLog.create({
+            utilizador: id_perfil,
+            data_atividade: getDate(),
+            tipo_atividade: "Criação de falta",
+            descricao: "Perfil com ID " + id_perfil + " criou uma falta para o dia " + data_falta
+        })
+
         res.status(200).json({
             success: true,
             message: "Falta criada com sucesso",
             data: data
         })
-    })
-    .catch(error =>{
-        console.log(error)
+    }
+    catch (error) {
         res.status(500).json({
             success: false,
             message: "Erro a criar a falta",
             error: error.message
         })
     }
-    )
 }
 
 controller.createManyFaltas = async function (req, res) {
     const faltasArray = req.body;
-    
+
     if (!Array.isArray(faltasArray)) {
         return res.status(400).json({
             success: false,
@@ -75,6 +92,12 @@ controller.createManyFaltas = async function (req, res) {
 
         const createdFaltas = await Faltas.bulkCreate(faltasWithTimestamps);
 
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Criação de falta",
+            descricao: "Foram registadas " + faltasArray.length + "faltas ao mesmo tempo"
+        })
+
         res.status(200).json({
             success: true,
             message: 'Faltas criadas com sucesso',
@@ -90,7 +113,7 @@ controller.createManyFaltas = async function (req, res) {
     }
 };
 
-controller.faltasList = async function (req, res){
+controller.faltasList = async function (req, res) {
     try {
         const data = await Faltas.findAll({
             include: [
@@ -134,7 +157,7 @@ controller.faltasList = async function (req, res){
     }
 }
 
-controller.faltasListUser = async function (req, res){
+controller.faltasListUser = async function (req, res) {
     const { id } = req.params
     try {
         const data = await Faltas.findAll({
@@ -156,7 +179,7 @@ controller.faltasListUser = async function (req, res){
                 },
             ],
             order: ['data_falta'],
-            where: {id_perfil: id}
+            where: { id_perfil: id }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -180,7 +203,7 @@ controller.faltasListUser = async function (req, res){
     }
 }
 
-controller.faltasListTipo = async function (req, res){
+controller.faltasListTipo = async function (req, res) {
     const { id } = req.params
     try {
         const data = await Faltas.findAll({
@@ -202,7 +225,7 @@ controller.faltasListTipo = async function (req, res){
                 },
             ],
             order: ['data_falta'],
-            where: {id_tipofalta: id}
+            where: { id_tipofalta: id }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -226,7 +249,7 @@ controller.faltasListTipo = async function (req, res){
     }
 }
 
-controller.faltasListAprovadasManager = async function (req, res){
+controller.faltasListAprovadasManager = async function (req, res) {
     const { id } = req.params
     try {
         const data = await Faltas.findAll({
@@ -248,7 +271,7 @@ controller.faltasListAprovadasManager = async function (req, res){
                 },
             ],
             order: ['data_falta'],
-            where: {validador: id, estado: "Aprovada"}
+            where: { validador: id, estado: "Aprovada" }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -272,7 +295,7 @@ controller.faltasListAprovadasManager = async function (req, res){
     }
 }
 
-controller.faltasListRejeitadasManager = async function (req, res){
+controller.faltasListRejeitadasManager = async function (req, res) {
     const { id } = req.params
     try {
         const data = await Faltas.findAll({
@@ -294,7 +317,7 @@ controller.faltasListRejeitadasManager = async function (req, res){
                 },
             ],
             order: ['data_falta'],
-            where: {validador: id, estado: "Rejeitada"}
+            where: { validador: id, estado: "Rejeitada" }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -318,7 +341,7 @@ controller.faltasListRejeitadasManager = async function (req, res){
     }
 }
 
-controller.faltasListAprovadas = async function (req, res){
+controller.faltasListAprovadas = async function (req, res) {
     try {
         const data = await Faltas.findAll({
             include: [
@@ -339,7 +362,7 @@ controller.faltasListAprovadas = async function (req, res){
                 },
             ],
             order: ['data_falta'],
-            where: {estado: "Aprovadas"}
+            where: { estado: "Aprovadas" }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -363,7 +386,7 @@ controller.faltasListAprovadas = async function (req, res){
     }
 }
 
-controller.faltasListRejeitadas = async function (req, res){
+controller.faltasListRejeitadas = async function (req, res) {
     try {
         const data = await Faltas.findAll({
             include: [
@@ -384,7 +407,7 @@ controller.faltasListRejeitadas = async function (req, res){
                 },
             ],
             order: ['data_falta'],
-            where: {estado: "Rejeitadas"}
+            where: { estado: "Rejeitadas" }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -408,7 +431,7 @@ controller.faltasListRejeitadas = async function (req, res){
     }
 }
 
-controller.faltasListAnalise = async function (req, res){
+controller.faltasListAnalise = async function (req, res) {
     try {
         const data = await Faltas.findAll({
             include: [
@@ -429,7 +452,7 @@ controller.faltasListAnalise = async function (req, res){
                 },
             ],
             order: ['data_falta'],
-            where: {estado: "Em análise"}
+            where: { estado: "Em análise" }
         });
 
         //Esta parte do código altera, na resposta, a variável anexo
@@ -453,7 +476,7 @@ controller.faltasListAnalise = async function (req, res){
     }
 }
 
-controller.faltasGet = async function (req, res){
+controller.faltasGet = async function (req, res) {
     const { id } = req.params;
 
     try {
@@ -499,30 +522,38 @@ controller.faltasGet = async function (req, res){
     }
 }
 
-controller.faltasDelete = async function (req, res){
+controller.faltasDelete = async function (req, res) {
     const { id } = req.params;
-    const data = await Faltas.destroy({
-        where: {id_falta: id}
-    })
-    .then(function() {
+
+    try {
+        const data = await Faltas.destroy({
+            where: { id_falta: id }
+        })
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Eliminação de falta",
+            descricao: "A falta com ID: " + id + "foi apagada"
+        })
+
         res.status(200).json({
             success: true,
             message: "Falta apagado"
         })
-    })
-    .catch(error => {
+    }
+    catch (error) {
         res.status(500).json({
             success: false,
             message: "Erro a apagar a falta",
             error: error.message
         });
-    })
+    }
 }
 
 controller.faltasUpdate = async function (req, res) {
     const { id } = req.params;
-    const { id_calendario, id_perfil, id_tipofalta, comentarios, motivo, validador, data_falta, estado} = req.body;
- 
+    const { id_calendario, id_perfil, id_tipofalta, comentarios, motivo, validador, data_falta, estado } = req.body;
+
     try {
         //Encontra o comentário que vamos atualizar
         const falta = await Faltas.findAll({ where: { id_falta: id } });
@@ -557,6 +588,13 @@ controller.faltasUpdate = async function (req, res) {
         }, {
             where: { id_falta: id }
         });
+
+        await AuditLog.create({
+            utilizador: id_perfil,
+            data_atividade: getDate(),
+            tipo_atividade: "Edição de falta",
+            descricao: "Perfil com ID " + id_perfil + " alterou a falta com ID: " + id 
+        })
 
         res.status(200).json({
             success: true,
@@ -600,7 +638,7 @@ controller.faltasJustificar = async function (req, res) {
         }
 
         await Faltas.update({
-            motivo:motivo, 
+            motivo: motivo,
             updated_at: getDate()
         }, {
             where: { id_falta: id }

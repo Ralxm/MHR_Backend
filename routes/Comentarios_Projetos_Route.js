@@ -24,7 +24,7 @@ router.get('/listProjeto/:id', controller.comentarioProjetoListPorProjeto); //Li
 router.get('/listIdeia/:id', controller.comentarioProjetoListPorIdeia); //Lista todos os comentários em uma dada ideia
 router.get('/listUser/:id', controller.comentarioProjetoListPorUser); //Lista todos os comentários feitos por um utilizador em todos os projetos ou ideias
 router.get('/get/:id', controller.comentarioProjetoGet);
-router.put('/delete:id', controller.comentarioProjetoDelete);
-router.post('/update:id', upload.single('anexo'), controller.comentarioProjetoUpdate);
+router.put('/delete/:id', controller.comentarioProjetoDelete);
+router.post('/update/:id', upload.single('anexo'), controller.comentarioProjetoUpdate);
 
 module.exports = router;

@@ -4,16 +4,27 @@ const fs = require('fs');
 const path = require('path');
 var sequelize = require('../models/database');
 const controller = {};
+const AuditLog = require('../models/AuditLog')
 
 function getDate() {
     let now = new Date();
+    
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
     let yyyy = now.getFullYear();
+
+    let hh = now.getHours();
+    let min = now.getMinutes();
+    let ss = now.getSeconds();
+    
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
-    let today = `${yyyy}-${mm}-${dd}`;
-    return today;
+    if (hh < 10) hh = '0' + hh;
+    if (min < 10) min = '0' + min;
+    if (ss < 10) ss = '0' + ss;
+
+    let datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    return datetime;
 }
 
 controller.comentarioProjetoCreate = async function (req, res) {
@@ -22,31 +33,37 @@ controller.comentarioProjetoCreate = async function (req, res) {
 
     const toNullIfStringNull = (value) => (value === "null" || value === "undefined") ? null : value;
 
-    const data = await Comentarios_Projetos.create({
-        id_projeto: toNullIfStringNull(id_projeto),
-        id_ideia: toNullIfStringNull(id_ideia),
-        autor: autor,
-        comentario: comentario,
-        anexo: anexo,
-        created_at: getDate(),
-        updated_at: getDate()
-    })
-        .then(function (data) {
-            res.status(200).json({
-                success: true,
-                message: "Comentario criado com sucesso no projeto",
-                data: data
-            })
+    try {
+        const data = await Comentarios_Projetos.create({
+            id_projeto: toNullIfStringNull(id_projeto),
+            id_ideia: toNullIfStringNull(id_ideia),
+            autor: autor,
+            comentario: comentario,
+            anexo: anexo,
+            created_at: getDate(),
+            updated_at: getDate()
         })
-        .catch(error => {
-            console.log(error)
-            res.status(500).json({
-                success: false,
-                message: "Erro a criar o Projeto",
-                error: error.message
-            })
-        }
-        )
+
+        await AuditLog.create({
+            utilizador: autor,
+            data_atividade: getDate(),
+            tipo_atividade: "Criação de comentário em projeto",
+            descricao: "Perfil com ID " + autor + " criou um comentário no projeto com ID: " + id_projeto
+        })
+
+        res.status(200).json({
+            success: true,
+            message: "Comentario criado com sucesso no projeto",
+            data: data
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro a criar o Projeto",
+            error: error.message
+        })
+    }
 }
 
 controller.comentarioProjetoList = async function (req, res) {
@@ -229,22 +246,30 @@ controller.comentarioProjetoGet = async function (req, res) {
 
 controller.comentarioProjetoDelete = async function (req, res) {
     const { id } = req.params;
-    const data = await Comentarios_Projetos.destroy({
-        where: { id_comentario_projeto: id }
-    })
-        .then(function () {
-            res.status(200).json({
-                success: true,
-                message: "Projeto apagado"
-            })
+
+    try {
+        const data = await Comentarios_Projetos.destroy({
+            where: { id_comentario_projeto: id }
         })
-        .catch(error => {
-            res.status(500).json({
-                success: false,
-                message: "Erro a apagar o Projeto",
-                error: error.message
-            });
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Eliminação de comentário em projeto",
+            descricao: "Comentário em projeto com ID " + id + " foi apagado"
         })
+
+        res.status(200).json({
+            success: true,
+            message: "Comentário em projeto apagado"
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Erro a apagar o comentário",
+            error: error.message
+        });
+    }
 }
 
 controller.comentarioProjetoUpdate = async function (req, res) {

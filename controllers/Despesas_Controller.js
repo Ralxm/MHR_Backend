@@ -1,62 +1,80 @@
 const Despesas = require('../models/Despesas');
 const Perfis = require('../models/Perfis')
+const AuditLog = require('../models/AuditLog')
 var sequelize = require('../models/database');
 const { Op } = require('sequelize');
 
 const controller = {};
 
-function getDate(){
+function getDate() {
     let now = new Date();
+    
     let dd = now.getDate();
     let mm = now.getMonth() + 1;
     let yyyy = now.getFullYear();
+
+    let hh = now.getHours();
+    let min = now.getMinutes();
+    let ss = now.getSeconds();
+    
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
-    let today = `${yyyy}-${mm}-${dd}`;
-    return today;
+    if (hh < 10) hh = '0' + hh;
+    if (min < 10) min = '0' + min;
+    if (ss < 10) ss = '0' + ss;
+
+    let datetime = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+    return datetime;
 }
 
-controller.despesasCreate = async function (req, res){
-    const { id_departamento, id_projeto, id_perfil, _data, descricao, valor, validador, estado, reembolsado_por, comentarios} = req.body;
+controller.despesasCreate = async function (req, res) {
+    const { id_departamento, id_projeto, id_perfil, _data, descricao, valor, validador, estado, reembolsado_por, comentarios } = req.body;
 
     let anexos = null;
     if (req.files && req.files.length > 0) {
         anexos = JSON.stringify(req.files.map(file => file.path));
     }
 
+    try {
+        const data = await Despesas.create({
+            id_departamento: id_departamento,
+            id_projeto: id_projeto,
+            id_perfil: id_perfil,
+            data: _data,
+            descricao: descricao,
+            valor: valor,
+            anexo: anexos,
+            validador: validador,
+            estado: estado,
+            reembolsado_por: reembolsado_por,
+            comentarios: comentarios,
+            created_at: getDate(),
+            updated_at: getDate()
+        })
 
-    const data = await Despesas.create({
-        id_departamento: id_departamento,
-        id_projeto: id_projeto,
-        id_perfil: id_perfil,
-        data: _data,
-        descricao: descricao,
-        valor: valor,
-        anexo: anexos,
-        validador: validador,
-        estado: estado,
-        reembolsado_por: reembolsado_por,
-        comentarios: comentarios,
-        created_at: getDate(),
-        updated_at: getDate()
-    })
-    .then(function(data){
+        await AuditLog.create({
+            utilizador: id_perfil,
+            data_atividade: getDate(),
+            tipo_atividade: "Criação de despesa",
+            descricao: "Perfil com ID " + id_perfil + " criou uma despesa no valor de " + valor
+        })
+
         res.status(200).json({
             success: true,
             message: "Despesa criado",
             data: data
         })
-    })
-    .catch(error =>
+    }
+    catch (error) {
         res.status(500).json({
             success: false,
             message: "Erro a criar a Despesa",
             error: error.message
         })
-    )
+    }
 }
 
-controller.despesasList = async function (req, res){
+controller.despesasList = async function (req, res) {
     try {
         const data = await Despesas.findAll({
             include: [
@@ -93,7 +111,7 @@ controller.despesasList = async function (req, res){
     }
 }
 
-controller.despesasListGestao = async function (req, res){
+controller.despesasListGestao = async function (req, res) {
     try {
         const data = await Despesas.findAll({
             where: {
@@ -133,7 +151,7 @@ controller.despesasListGestao = async function (req, res){
     }
 }
 
-controller.despesasListHistorico = async function (req, res){
+controller.despesasListHistorico = async function (req, res) {
     try {
         const data = await Despesas.findAll({
             where: {
@@ -173,7 +191,7 @@ controller.despesasListHistorico = async function (req, res){
     }
 }
 
-controller.despesasListPorUser = async function (req, res){
+controller.despesasListPorUser = async function (req, res) {
     const { id } = req.params;
     try {
         const data = await Despesas.findAll({
@@ -213,11 +231,11 @@ controller.despesasListPorUser = async function (req, res){
     }
 }
 
-controller.despesasListAprovadasPorUser = async function (req, res){
+controller.despesasListAprovadasPorUser = async function (req, res) {
     const { id } = req.params;
     try {
         const data = await Despesas.findAll({
-            where: {validador: id, estado: "Aprovada"},
+            where: { validador: id, estado: "Aprovada" },
             include: [
                 {
                     model: Perfis,
@@ -252,10 +270,10 @@ controller.despesasListAprovadasPorUser = async function (req, res){
     }
 }
 
-controller.despesasListAprovadas = async function (req, res){
+controller.despesasListAprovadas = async function (req, res) {
     try {
         const data = await Despesas.findAll({
-            where: {estado: "Aprovada"},
+            where: { estado: "Aprovada" },
             include: [
                 {
                     model: Perfis,
@@ -290,10 +308,10 @@ controller.despesasListAprovadas = async function (req, res){
     }
 }
 
-controller.despesasListRejeitadas = async function (req, res){
+controller.despesasListRejeitadas = async function (req, res) {
     try {
         const data = await Despesas.findAll({
-            where: {estado: "Rejeitada"},
+            where: { estado: "Rejeitada" },
             include: [
                 {
                     model: Perfis,
@@ -328,7 +346,7 @@ controller.despesasListRejeitadas = async function (req, res){
     }
 }
 
-controller.despesasListPorAprovar = async function (req, res){
+controller.despesasListPorAprovar = async function (req, res) {
     try {
         const data = await Despesas.findAll({
             include: [
@@ -368,11 +386,11 @@ controller.despesasListPorAprovar = async function (req, res){
     }
 }
 
-controller.despesasListRejeitadasPorUser = async function (req, res){
+controller.despesasListRejeitadasPorUser = async function (req, res) {
     const { id } = req.params;
     try {
         const data = await Despesas.findAll({
-            where: {validador: id, estado: "Rejeitada"},
+            where: { validador: id, estado: "Rejeitada" },
             include: [
                 {
                     model: Perfis,
@@ -407,7 +425,7 @@ controller.despesasListRejeitadasPorUser = async function (req, res){
     }
 }
 
-controller.despesasGet = async function (req, res){
+controller.despesasGet = async function (req, res) {
     const { id } = req.params;
 
     try {
@@ -447,32 +465,40 @@ controller.despesasGet = async function (req, res){
     }
 }
 
-controller.despesasDelete = async function (req, res){
+controller.despesasDelete = async function (req, res) {
     const { id } = req.params;
-    const data = await Despesas.destroy({
-        where: {id_despesa: id}
-    })
-    .then(function() {
+
+    try {
+        const data = await Despesas.destroy({
+            where: { id_despesa: id }
+        })
+
+        await AuditLog.create({
+            data_atividade: getDate(),
+            tipo_atividade: "Eliminação de despesa",
+            descricao: "A despesa com ID: " + id + " foi apagada."
+        })
+
         res.status(200).json({
             success: true,
             message: "Despesa apagada"
         })
-    })
-    .catch(error => {
+    }
+    catch (error) {
         res.status(500).json({
             success: false,
             message: "Erro a apagar a despesa",
             error: error.message
         });
-    })
+    }
 }
 
 controller.despesasUpdate = async function (req, res) {
     const { id } = req.params;
-    const { id_departamento, id_projeto, id_perfil, _data, descricao, valor, validador, estado, reembolsado_por, comentarios, existingAnexos} = req.body;
+    const { id_departamento, id_projeto, id_perfil, _data, descricao, valor, validador, estado, reembolsado_por, comentarios, existingAnexos } = req.body;
 
     const toNullIfStringNull = (value) => (value === "null" || value === "undefined") ? null : value;
-    
+
     try {
         const despesa = await Despesas.findOne({ where: { id_despesa: id } });
 
@@ -506,6 +532,13 @@ controller.despesasUpdate = async function (req, res) {
         }, {
             where: { id_despesa: id }
         });
+
+        await AuditLog.create({
+            utilizador: id_perfil,
+            data_atividade: getDate(),
+            tipo_atividade: "Edição de despesa",
+            descricao: "Perfil com ID: " + id_perfil + " alterou a despesa com ID: " + id
+        })
 
         res.status(200).json({
             success: true,
