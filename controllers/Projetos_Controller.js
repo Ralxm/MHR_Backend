@@ -172,7 +172,6 @@ controller.projetoDelete = async function (req, res) {
         })
 
         await AuditLog.create({
-            utilizador: id_perfil,
             data_atividade: getDate(),
             tipo_atividade: "Eliminação de projeto",
             descricao: "Projeto com o ID: " + id + " foi apagado"

@@ -231,7 +231,7 @@ controller.perfisDelete = async function (req, res) {
 
 controller.perfisUpdate = async function (req, res) {
     const { id } = req.params;
-    const { id_departamento, id_utilizador, nome, email, morada, telemovel, data_nascimento, distrito, numero_mecanografico, estado } = req.body;
+    const { id_departamento, id_utilizador, nome, email, morada, telemovel, data_nascimento, distrito, numero_mecanografico, estado, id_tipo, nome_utilizador } = req.body;
 
     try {
         const data = await Perfis.update({
@@ -249,7 +249,9 @@ controller.perfisUpdate = async function (req, res) {
         })
 
         await Utilizadores.update({
-            estado: estado
+            nome_utilizador: nome_utilizador,
+            estado: estado,
+            id_tipo: id_tipo
         }, {
             where: { id_utilizador: id_utilizador }
         })
@@ -259,7 +261,8 @@ controller.perfisUpdate = async function (req, res) {
             message: "Perfil atualizado com sucesso"
         })
     }
-    catch {
+    catch (error) {
+        console.log(error)
         res.status(500).json({
             success: false,
             message: "Erro a atualizar o perfil",

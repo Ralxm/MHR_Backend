@@ -21,7 +21,7 @@ const Utilizadores = SequelizeDB.define('utilizadores', {
         unique: true,
     },
     pass: Sequelize.STRING(256),
-    estado: Sequelize.STRING(50), //Ativa, Desativada
+    estado: Sequelize.STRING(50), //Ativa, Desativada, Pendente
     token_resgate: Sequelize.STRING(6),
     validade_token: Sequelize.DATE,
     created_at: Sequelize.DATE,

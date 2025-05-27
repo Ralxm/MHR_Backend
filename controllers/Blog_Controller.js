@@ -62,7 +62,7 @@ controller.blogCreate = async function (req, res) {
 
         res.status(200).json({
             success: true,
-            message: "Publicação criada no blog",
+            message: "Publicação criada com sucesso! Esta está em aprovação e não aparecerá no blog até ser aprovada.",
             data: data
         });
     } catch (error) {

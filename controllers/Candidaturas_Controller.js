@@ -64,6 +64,7 @@ controller.candidaturasCreate = async function (req, res) {
         })
     }
     catch (error) {
+        console.log(error)
         res.status(500).json({
             success: false,
             message: "Erro a criar a candidatura",
@@ -410,45 +411,18 @@ controller.candidaturasAceitar = async function (req, res) {
         });
 
         if (vaga) {
-            if (vaga.numero_vagas_restantes === 1) {
-                vaga.numero_vagas_restantes = 0;
-                vaga.estado = "Ocupada";
-                console.log("Alterei a vaga para ocupada");
-            } else if (vaga.numero_vagas_restantes > 1) {
-                vaga.numero_vagas_restantes -= 1;
-                console.log("Diminui um valor do numero de vagas restantes");
+            if (vaga.numero_vagas_restantes === 1) { //Se a vaga tiver um espaço restante
+                vaga.numero_vagas_restantes = 0; //Coloca o espaço restante a 0
+                vaga.estado = "Ocupada"; //Altera o estado da vaga
+            } else if (vaga.numero_vagas_restantes > 1) { //Se a vaga tiver mais que um espaço restante
+                vaga.numero_vagas_restantes -= 1;  //Diminui o numero de espaços em um
             }
 
             vaga.changed('numero_vagas_restantes', true);
             vaga.changed('estado', true);
 
             await vaga.save();
-            console.log("Está tudo feito");
         }
-
-        /*const perfil = await Perfis.findOne({where: {id_utilizador: candidatura.id_utilizador}})
-        const utilizador = await Utilizadores.findOne({where: {id_utilizador: candidatura.id_utilizador}})
-
-        if(!perfil){
-            await Perfis.create({
-                id_departamento: 1,
-                id_utilizador: candidatura.id_utilizador,
-                nome: "",
-                email: candidatura.email,
-                morada: "",
-                telemovel: candidatura.telemovel,
-                data_nascimento: "01-01-1970",
-                distrito: "",
-                created_at: getDate(),
-                updated_at: getDate()
-            })
-
-            if(utilizador){
-                utilizador.id_tipo = 3;
-                await utilizador.save();
-            }
-        }*/
-
 
         res.status(200).json({
             success: true,
