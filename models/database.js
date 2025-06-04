@@ -8,6 +8,12 @@ const sequelize = new Sequelize(
     host: 'dpg-d102sammcj7s7385buf0-a.frankfurt-postgres.render.com',
     dialect: 'postgres',
     port: 5432,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false 
+      }
+    }
   }
 );
 
