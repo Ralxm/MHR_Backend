@@ -1,9 +1,9 @@
 const { Sequelize }= require('sequelize');
 
 const sequelize = new Sequelize(
-  'mhrs_db',
-  'mhrs',
-  'mhrspwd',
+  'mhr',
+  'mhr',
+  'password',
   {
     host: '158.220.95.219',
     dialect: 'postgres',

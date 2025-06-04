@@ -59,7 +59,7 @@ const _Vaga = require('./models/Vaga');
 
 //DEFINIR OPÇÕES
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: 'http://158.220.95.219',
   credentials: true,
 };
 app.set('port', process.env.PORT || 8080);
