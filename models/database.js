@@ -1,11 +1,11 @@
 const { Sequelize }= require('sequelize');
 
 const sequelize = new Sequelize(
-  'mhrs_db',
-  'mhrs',
-  'mhrspwd',
+  'mhr',
+  'mhr',
+  'hMiY0tKO3SJWW2k5vSZ1mGDngZcN0Yu6',
   {
-    host: '158.220.95.219',
+    host: 'dpg-d102sammcj7s7385buf0-a.frankfurt-postgres.render.com/mhr',
     dialect: 'postgres',
     port: 5432,
   }
