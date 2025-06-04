@@ -5,7 +5,7 @@ const sequelize = new Sequelize(
   'mhr',
   'hMiY0tKO3SJWW2k5vSZ1mGDngZcN0Yu6',
   {
-    host: 'dpg-d102sammcj7s7385buf0-a.frankfurt-postgres.render.com/mhr',
+    host: 'hMiY0tKO3SJWW2k5vSZ1mGDngZcN0Yu6@dpg-d102sammcj7s7385buf0-a.frankfurt-postgres.render.com/mhr',
     dialect: 'postgres',
     port: 5432,
   }
